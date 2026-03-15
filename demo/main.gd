@@ -1,6 +1,6 @@
 extends Control
 
-@onready var result_label: Label = $VBoxContainer/ResultLabel
+@onready var result_label: Label = $SafeAreaContainer/VBoxContainer/ResultLabel
 
 func _on_today_steps_pressed() -> void:
 	HealthKit.run_today_steps_query()

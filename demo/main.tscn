@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://demo_main"]
+[gd_scene load_steps=3 format=3 uid="uid://demo_main"]
 
 [ext_resource type="Script" path="res://main.gd" id="1_main"]
+[ext_resource type="Script" path="res://scenes/safe_area_container.gd" id="2_safe_area"]
 
 [node name="Main" type="Control"]
 layout_mode = 3
@@ -11,48 +12,68 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_main")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
+[node name="SafeAreaContainer" type="MarginContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 16
+theme_override_constants/margin_left = 60
+theme_override_constants/margin_right = 60
+theme_override_constants/margin_bottom = 30
+script = ExtResource("2_safe_area")
 
-[node name="Title" type="Label" parent="VBoxContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="SafeAreaContainer"]
 layout_mode = 2
+theme_override_constants/separation = 40
+alignment = 1
+
+[node name="Title" type="Label" parent="SafeAreaContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 42
 text = "HealthKit Plugin Demo"
 horizontal_alignment = 1
 
-[node name="TodaySteps" type="Button" parent="VBoxContainer"]
+[node name="TodaySteps" type="Button" parent="SafeAreaContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 80)
 layout_mode = 2
+theme_override_font_sizes/font_size = 36
 text = "Get Today's Steps"
 
-[node name="TotalSteps" type="Button" parent="VBoxContainer"]
+[node name="TotalSteps" type="Button" parent="SafeAreaContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 80)
 layout_mode = 2
+theme_override_font_sizes/font_size = 36
 text = "Get Total Steps"
 
-[node name="PeriodSteps" type="Button" parent="VBoxContainer"]
+[node name="PeriodSteps" type="Button" parent="SafeAreaContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 80)
 layout_mode = 2
+theme_override_font_sizes/font_size = 36
 text = "Get Period Steps (7 days)"
 
-[node name="TrackPermission" type="Button" parent="VBoxContainer"]
+[node name="TrackPermission" type="Button" parent="SafeAreaContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 80)
 layout_mode = 2
+theme_override_font_sizes/font_size = 36
 text = "Request Tracking Permission"
 
-[node name="DebugMode" type="Button" parent="VBoxContainer"]
+[node name="DebugMode" type="Button" parent="SafeAreaContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 80)
 layout_mode = 2
+theme_override_font_sizes/font_size = 36
 text = "Check AdMob Debug Mode"
 
-[node name="ResultLabel" type="Label" parent="VBoxContainer"]
+[node name="ResultLabel" type="Label" parent="SafeAreaContainer/VBoxContainer"]
 layout_mode = 2
+theme_override_font_sizes/font_size = 32
 text = "Press a button to test"
 horizontal_alignment = 1
 autowrap_mode = 2
 
-[connection signal="pressed" from="VBoxContainer/TodaySteps" to="." method="_on_today_steps_pressed"]
-[connection signal="pressed" from="VBoxContainer/TotalSteps" to="." method="_on_total_steps_pressed"]
-[connection signal="pressed" from="VBoxContainer/PeriodSteps" to="." method="_on_period_steps_pressed"]
-[connection signal="pressed" from="VBoxContainer/TrackPermission" to="." method="_on_track_permission_pressed"]
-[connection signal="pressed" from="VBoxContainer/DebugMode" to="." method="_on_debug_mode_pressed"]
+[connection signal="pressed" from="SafeAreaContainer/VBoxContainer/TodaySteps" to="." method="_on_today_steps_pressed"]
+[connection signal="pressed" from="SafeAreaContainer/VBoxContainer/TotalSteps" to="." method="_on_total_steps_pressed"]
+[connection signal="pressed" from="SafeAreaContainer/VBoxContainer/PeriodSteps" to="." method="_on_period_steps_pressed"]
+[connection signal="pressed" from="SafeAreaContainer/VBoxContainer/TrackPermission" to="." method="_on_track_permission_pressed"]
+[connection signal="pressed" from="SafeAreaContainer/VBoxContainer/DebugMode" to="." method="_on_debug_mode_pressed"]
