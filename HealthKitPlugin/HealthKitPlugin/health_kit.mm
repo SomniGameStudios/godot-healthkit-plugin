@@ -3,10 +3,6 @@
 #include <HealthKit/HealthKit.h>
 
 HealthKit *HealthKit::instance = NULL;
-std::map<String, int> period_steps;
-
-int today_steps = 0;
-int total_steps = 0;
 
 void HealthKit::_bind_methods() {
     ClassDB::bind_method(D_METHOD("run_today_steps_query"), &HealthKit::run_today_steps_walked_query);
@@ -82,7 +78,7 @@ void HealthKit::run_today_steps_walked_query() {
         } else {
             double steps = [[result sumQuantity] doubleValueForUnit:[HKUnit countUnit]];
             NSLog(@"Today's steps: %f", steps);
-            today_steps = steps;
+            instance->today_steps = (int)steps;
         }
     }];
     
@@ -94,8 +90,8 @@ void HealthKit::run_total_steps_walked_query() {
     HKHealthStore* store = (__bridge HKHealthStore*)health_store;
 
     NSDateComponents *components = [[NSDateComponents alloc] init];
-    [components setDay:1]; // Monday
-    [components setMonth:1]; // May
+    [components setDay:1];
+    [components setMonth:1]; // January
     [components setYear:2024];
     [components setHour:0];
     [components setMinute:0];
@@ -116,7 +112,7 @@ void HealthKit::run_total_steps_walked_query() {
         } else {
             double steps = [[result sumQuantity] doubleValueForUnit:[HKUnit countUnit]];
             NSLog(@"Total steps since epoch %f", steps);
-            total_steps = steps;
+            instance->total_steps = (int)steps;
         }
     }];
     
@@ -154,7 +150,7 @@ void HealthKit::run_period_steps_query(int days) {
             return;
         }
 
-        period_steps.clear();
+        instance->period_steps.clear();
 
         [results enumerateStatisticsFromDate:startDate toDate:now withBlock:^(HKStatistics * _Nonnull statistics, BOOL * _Nonnull stop) {
             if (statistics.sumQuantity) {
@@ -162,11 +158,11 @@ void HealthKit::run_period_steps_query(int days) {
                 NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
                 [formatter setDateFormat:@"yyyy-MM-dd"];
                 NSString *dateStr = [formatter stringFromDate:statistics.startDate];
-                period_steps[dateStr.UTF8String] = (int)steps;
+                instance->period_steps[dateStr.UTF8String] = (int)steps;
             }
         }];
 
-        for (const auto& entry : period_steps) {
+        for (const auto& entry : instance->period_steps) {
             NSString *key = [NSString stringWithUTF8String:entry.first.utf8().get_data()];
             NSLog(@"Period steps entry: %@ -> %d", key, entry.second);
         }

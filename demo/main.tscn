@@ -1,0 +1,58 @@
+[gd_scene load_steps=2 format=3 uid="uid://demo_main"]
+
+[ext_resource type="Script" path="res://main.gd" id="1_main"]
+
+[node name="Main" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_main")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 16
+
+[node name="Title" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+text = "HealthKit Plugin Demo"
+horizontal_alignment = 1
+
+[node name="TodaySteps" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "Get Today's Steps"
+
+[node name="TotalSteps" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "Get Total Steps"
+
+[node name="PeriodSteps" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "Get Period Steps (7 days)"
+
+[node name="TrackPermission" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "Request Tracking Permission"
+
+[node name="DebugMode" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "Check AdMob Debug Mode"
+
+[node name="ResultLabel" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+text = "Press a button to test"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[connection signal="pressed" from="VBoxContainer/TodaySteps" to="." method="_on_today_steps_pressed"]
+[connection signal="pressed" from="VBoxContainer/TotalSteps" to="." method="_on_total_steps_pressed"]
+[connection signal="pressed" from="VBoxContainer/PeriodSteps" to="." method="_on_period_steps_pressed"]
+[connection signal="pressed" from="VBoxContainer/TrackPermission" to="." method="_on_track_permission_pressed"]
+[connection signal="pressed" from="VBoxContainer/DebugMode" to="." method="_on_debug_mode_pressed"]

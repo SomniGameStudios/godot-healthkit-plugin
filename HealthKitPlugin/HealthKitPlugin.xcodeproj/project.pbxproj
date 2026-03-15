@@ -29,7 +29,7 @@
 /* Begin PBXFileReference section */
 		85243DD42E4B7C9000D3BF06 /* ios_native.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ios_native.h; sourceTree = "<group>"; };
 		85243DD52E4B7C9C00D3BF06 /* ios_native.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ios_native.mm; sourceTree = "<group>"; };
-		C05C500F2B4C9BB500F07DC3 /* libIOSBridgePlugin.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libIOSBridgePlugin.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		C05C500F2B4C9BB500F07DC3 /* libHealthKitPlugin.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libHealthKitPlugin.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		C05C50122B4C9BB500F07DC3 /* iosbridge_module.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = iosbridge_module.h; sourceTree = "<group>"; };
 		C05C50132B4C9BB500F07DC3 /* iosbridge_module.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = iosbridge_module.cpp; sourceTree = "<group>"; };
 		C05C501B2B4CA4D100F07DC3 /* health_kit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = health_kit.h; sourceTree = "<group>"; };
@@ -50,7 +50,7 @@
 		C05C50062B4C9BB500F07DC3 = {
 			isa = PBXGroup;
 			children = (
-				C05C50112B4C9BB500F07DC3 /* IOSBridgePlugin */,
+				C05C50112B4C9BB500F07DC3 /* HealthKitPlugin */,
 				C05C50102B4C9BB500F07DC3 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -58,12 +58,12 @@
 		C05C50102B4C9BB500F07DC3 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				C05C500F2B4C9BB500F07DC3 /* libIOSBridgePlugin.a */,
+				C05C500F2B4C9BB500F07DC3 /* libHealthKitPlugin.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		C05C50112B4C9BB500F07DC3 /* IOSBridgePlugin */ = {
+		C05C50112B4C9BB500F07DC3 /* HealthKitPlugin */ = {
 			isa = PBXGroup;
 			children = (
 				C05C50122B4C9BB500F07DC3 /* iosbridge_module.h */,
@@ -73,15 +73,15 @@
 				85243DD42E4B7C9000D3BF06 /* ios_native.h */,
 				85243DD52E4B7C9C00D3BF06 /* ios_native.mm */,
 			);
-			path = IOSBridgePlugin;
+			path = HealthKitPlugin;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		C05C500E2B4C9BB500F07DC3 /* IOSBridgePlugin */ = {
+		C05C500E2B4C9BB500F07DC3 /* HealthKitPlugin */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = C05C50182B4C9BB500F07DC3 /* Build configuration list for PBXNativeTarget "IOSBridgePlugin" */;
+			buildConfigurationList = C05C50182B4C9BB500F07DC3 /* Build configuration list for PBXNativeTarget "HealthKitPlugin" */;
 			buildPhases = (
 				C05C500B2B4C9BB500F07DC3 /* Sources */,
 				C05C500C2B4C9BB500F07DC3 /* Frameworks */,
@@ -91,9 +91,9 @@
 			);
 			dependencies = (
 			);
-			name = IOSBridgePlugin;
+			name = HealthKitPlugin;
 			productName = HealthKitPlugin;
-			productReference = C05C500F2B4C9BB500F07DC3 /* libIOSBridgePlugin.a */;
+			productReference = C05C500F2B4C9BB500F07DC3 /* libHealthKitPlugin.a */;
 			productType = "com.apple.product-type.library.static";
 		};
 /* End PBXNativeTarget section */
@@ -110,7 +110,7 @@
 					};
 				};
 			};
-			buildConfigurationList = C05C500A2B4C9BB500F07DC3 /* Build configuration list for PBXProject "IOSBridgePlugin" */;
+			buildConfigurationList = C05C500A2B4C9BB500F07DC3 /* Build configuration list for PBXProject "HealthKitPlugin" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -123,7 +123,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				C05C500E2B4C9BB500F07DC3 /* IOSBridgePlugin */,
+				C05C500E2B4C9BB500F07DC3 /* HealthKitPlugin */,
 			);
 		};
 /* End PBXProject section */
@@ -184,6 +184,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
+					"IS_ADMOB_DEBUG_OR_RELEASE=1",
 					"$(inherited)",
 				);
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -258,7 +259,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = JJ8VH333J5;
+				DEVELOPMENT_TEAM = "";
 				HEADER_SEARCH_PATHS = (
 					"${SRCROOT}/godot",
 					"${SRCROOT}/godot/platform/ios",
@@ -279,7 +280,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = JJ8VH333J5;
+				DEVELOPMENT_TEAM = "";
 				HEADER_SEARCH_PATHS = (
 					"${SRCROOT}/godot",
 					"${SRCROOT}/godot/platform/ios",
@@ -299,7 +300,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		C05C500A2B4C9BB500F07DC3 /* Build configuration list for PBXProject "IOSBridgePlugin" */ = {
+		C05C500A2B4C9BB500F07DC3 /* Build configuration list for PBXProject "HealthKitPlugin" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C05C50162B4C9BB500F07DC3 /* Debug */,
@@ -308,7 +309,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		C05C50182B4C9BB500F07DC3 /* Build configuration list for PBXNativeTarget "IOSBridgePlugin" */ = {
+		C05C50182B4C9BB500F07DC3 /* Build configuration list for PBXNativeTarget "HealthKitPlugin" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C05C50192B4C9BB500F07DC3 /* Debug */,
