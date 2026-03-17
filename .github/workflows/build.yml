@@ -1,0 +1,35 @@
+name: Build
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      godot_version:
+        description: 'Godot version (e.g. 4.6.1)'
+        required: false
+        default: '4.6.1'
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install scons
+        run: pip install scons
+
+      - name: Build plugin
+        run: ./HealthKitPlugin/scripts/build.sh ${{ github.event.inputs.godot_version || '4.6.1' }}
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: HealthKitPlugin
+          path: HealthKitPlugin/build/output/

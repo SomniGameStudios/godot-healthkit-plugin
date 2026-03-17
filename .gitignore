@@ -1,0 +1,29 @@
+# Build artifacts
+build/
+bin/
+*.a
+
+# Xcode
+xcuserdata/
+DerivedData/
+Build/
+
+# Godot source (downloaded by build scripts)
+HealthKitPlugin/godot/
+
+# SCons
+.sconsign.dblite
+*.o
+*.os
+
+# Demo plugin binaries (populated by build)
+demo/ios/plugins/*
+!demo/ios/plugins/.gitkeep
+
+# Godot editor
+.godot/
+
+# OS
+.DS_Store
+*~
+.claude/settings.local.json

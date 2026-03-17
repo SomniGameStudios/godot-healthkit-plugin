@@ -27,8 +27,10 @@ public:
     ~HealthKit();
     
 private:
+    int today_steps = 0;
+    int total_steps = 0;
     std::map<String, int> period_steps;
-    void* health_store;
+    void* health_store = nullptr;
 };
 
 #endif

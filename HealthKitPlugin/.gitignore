@@ -1,0 +1,10 @@
+# Downloaded Godot source
+godot/
+
+# Xcode build
+Build/
+xcuserdata/
+DerivedData/
+
+# Misc
+*~

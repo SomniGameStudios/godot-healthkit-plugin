@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "C05C500E2B4C9BB500F07DC3"
-               BuildableName = "libIOSBridgePlugin.a"
-               BlueprintName = "IOSBridgePlugin"
-               ReferencedContainer = "container:IOSBridgePlugin.xcodeproj">
+               BuildableName = "libHealthKitPlugin.a"
+               BlueprintName = "HealthKitPlugin"
+               ReferencedContainer = "container:HealthKitPlugin.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -51,9 +51,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "C05C500E2B4C9BB500F07DC3"
-            BuildableName = "libIOSBridgePlugin.a"
-            BlueprintName = "IOSBridgePlugin"
-            ReferencedContainer = "container:IOSBridgePlugin.xcodeproj">
+            BuildableName = "libHealthKitPlugin.a"
+            BlueprintName = "HealthKitPlugin"
+            ReferencedContainer = "container:HealthKitPlugin.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
    </ProfileAction>
@@ -61,7 +61,7 @@
       buildConfiguration = "Debug">
    </AnalyzeAction>
    <ArchiveAction
-      buildConfiguration = "Debug"
+      buildConfiguration = "Release"
       revealArchiveInOrganizer = "YES">
    </ArchiveAction>
 </Scheme>

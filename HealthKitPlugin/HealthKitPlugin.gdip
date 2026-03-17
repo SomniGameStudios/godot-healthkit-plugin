@@ -1,0 +1,21 @@
+[config]
+name="HealthKitPlugin"
+binary="HealthKitPlugin/bin/HealthKitPlugin.xcframework"
+
+initialization="init_iosbridge_plugin"
+deinitialization="deinit_iosbridge_plugin"
+
+[dependencies]
+linked=[]
+embedded=[]
+system=["HealthKit.framework", "AppTrackingTransparency.framework", "AdSupport.framework"]
+
+capabilities=["healthkit"]
+
+files=[]
+linker_flags=[]
+
+[plist]
+NSHealthShareUsageDescription:string_input="This app needs access to your step count data."
+NSHealthUpdateUsageDescription:string_input="This app needs access to update your health data."
+NSUserTrackingUsageDescription:string_input="This app requests permission to track activity for analytics."

@@ -2,7 +2,9 @@
 #import <AppTrackingTransparency/AppTrackingTransparency.h>
 #import <AdSupport/AdSupport.h>
 
+#ifndef IS_ADMOB_DEBUG_OR_RELEASE
 #define IS_ADMOB_DEBUG_OR_RELEASE 0
+#endif
 
 IOSNative *IOSNative::instance = NULL;
 
@@ -23,9 +25,8 @@ IOSNative::IOSNative() {
 }
 
 int IOSNative::is_admob_debug_or_release() {
-    int result = false;
-    NSLog(@"is_admob_debug_or_release. %d", result);
-    return result;
+    NSLog(@"is_admob_debug_or_release. %d", IS_ADMOB_DEBUG_OR_RELEASE);
+    return IS_ADMOB_DEBUG_OR_RELEASE;
 }
 
 void IOSNative::request_track_permission() {

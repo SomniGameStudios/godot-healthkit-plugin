@@ -1,0 +1,107 @@
+# Godot HealthKit Plugin
+
+A Godot 4 iOS plugin that provides native HealthKit step counting and App Tracking Transparency for iOS games.
+
+## Features
+
+- **HealthKit** — Query today's steps, total steps, and daily step breakdowns
+- **App Tracking Transparency** — Request IDFA tracking permission (iOS 14+)
+- **AdMob debug flag** — Check if running in debug or release mode
+
+## Quick Start
+
+1. Download the latest release zip
+2. Extract and copy `HealthKitPlugin.gdip` and `HealthKitPlugin/` folder into your Godot project's `ios/plugins/` directory:
+   ```
+   your-godot-project/
+     ios/
+       plugins/
+         HealthKitPlugin.gdip
+         HealthKitPlugin/
+           bin/
+             HealthKitPlugin.debug.xcframework/
+             HealthKitPlugin.release.xcframework/
+   ```
+3. In Godot, go to **Project > Export > iOS** and enable the **HealthKitPlugin** plugin
+4. The plugin auto-injects required permissions (HealthKit, Tracking) into your export
+
+## GDScript API
+
+The plugin registers two singletons accessible via `Engine.get_singleton()`:
+
+### `iosHealthKit`
+
+```gdscript
+if Engine.has_singleton("iosHealthKit"):
+    var hk = Engine.get_singleton("iosHealthKit")
+
+    # Async queries (call first, then read result after ~1s)
+    hk.run_today_steps_query()
+    hk.run_total_steps_query()
+    hk.run_period_steps_query(7)  # last 7 days
+
+    # Read cached results
+    var today: int = hk.get_today_steps()
+    var total: int = hk.get_total_steps()
+    var period: Dictionary = hk.get_period_steps_dict()  # {"2026-03-15": 5432, ...}
+```
+
+### `iosNative`
+
+```gdscript
+if Engine.has_singleton("iosNative"):
+    var native = Engine.get_singleton("iosNative")
+    native.request_track_permission()
+    var is_debug: int = native.is_admob_debug_or_release()
+```
+
+## Building from Source
+
+Requires macOS with Xcode and Python (for scons).
+
+```bash
+# Install scons
+pip install scons
+
+# Build for Godot 4.6.1
+./HealthKitPlugin/scripts/build.sh 4.6.1
+```
+
+This will:
+1. Download Godot source (for headers only)
+2. Generate headers with scons
+3. Build Debug + Release static libraries with xcodebuild
+4. Create `.xcframework` bundles
+5. Copy output to `demo/ios/plugins/`
+
+Build output is in `HealthKitPlugin/build/output/`.
+
+## Demo Project
+
+The `demo/` directory contains a minimal Godot project that demonstrates all plugin APIs. It provides mock data when running on non-iOS platforms for easy editor testing.
+
+## Project Structure
+
+```
+godot-healthkit-plugin/
+  HealthKitPlugin/           # Plugin source
+    HealthKitPlugin/         # Native Objective-C++ code
+    HealthKitPlugin.xcodeproj/
+    HealthKitPlugin.gdip     # Plugin descriptor
+    scripts/                 # Build automation
+  demo/                      # Demo Godot project
+  docs/                      # Documentation
+  .github/workflows/         # CI/CD
+```
+
+## Troubleshooting
+
+### `platform_config.h` not found
+Run the build script with the correct Godot version. The headers must match your Godot version.
+
+### Linker errors with `ClassDB::bind_method`
+Ensure you're using the correct Debug/Release binary for your export type. The xcframework format handles this automatically.
+
+## License
+
+See [LICENSE](LICENSE) for details.
