@@ -9,7 +9,7 @@ DerivedData/
 Build/
 
 # Godot source (downloaded by build scripts)
-HealthKitPlugin/godot/
+platforms/ios/godot/
 
 # SCons
 .sconsign.dblite
@@ -17,8 +17,8 @@ HealthKitPlugin/godot/
 *.os
 
 # Demo plugin binaries (populated by build)
-demo/ios/plugins/*
-!demo/ios/plugins/.gitkeep
+platforms/godot_editor/ios/plugins/*
+!platforms/godot_editor/ios/plugins/.gitkeep
 
 # Godot editor
 .godot/

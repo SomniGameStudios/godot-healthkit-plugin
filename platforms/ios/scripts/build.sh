@@ -1,8 +1,8 @@
 #!/bin/bash
 # scripts/build.sh — Main build script for HealthKitPlugin
 #
-# Usage: ./HealthKitPlugin/scripts/build.sh <godot_version>
-# Example: ./HealthKitPlugin/scripts/build.sh 4.6.1
+# Usage: ./platforms/ios/scripts/build.sh <godot_version>
+# Example: ./platforms/ios/scripts/build.sh 4.6.1
 #
 # Produces:
 #   build/output/HealthKitPlugin.gdip
@@ -15,7 +15,7 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source "$SCRIPT_DIR/common.sh"
 
 PLUGIN_DIR="$SCRIPT_DIR/.."
-PROJECT_ROOT="$PLUGIN_DIR/.."
+PROJECT_ROOT="$PLUGIN_DIR/../.."
 BUILD_DIR="$PLUGIN_DIR/build"
 OUTPUT_DIR="$BUILD_DIR/output"
 
@@ -91,8 +91,8 @@ log_info "To install, copy the contents of build/output/ into your Godot project
 log_info "  cp -r $OUTPUT_DIR/* <your-godot-project>/ios/plugins/"
 
 # Optionally copy to demo project
-DEMO_PLUGINS="$PROJECT_ROOT/demo/ios/plugins"
-if [ -d "$PROJECT_ROOT/demo" ]; then
+DEMO_PLUGINS="$PROJECT_ROOT/platforms/godot_editor/ios/plugins"
+if [ -d "$PROJECT_ROOT/platforms/godot_editor" ]; then
     log_info "Copying to demo project..."
     rm -rf "$DEMO_PLUGINS/HealthKitPlugin" "$DEMO_PLUGINS/HealthKitPlugin.gdip"
     cp "$OUTPUT_DIR/HealthKitPlugin.gdip" "$DEMO_PLUGINS/"

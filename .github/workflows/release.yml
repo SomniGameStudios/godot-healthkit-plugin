@@ -32,11 +32,11 @@ jobs:
         run: pip install scons
 
       - name: Build plugin
-        run: ./HealthKitPlugin/scripts/build.sh ${{ inputs.godot_version }}
+        run: ./platforms/ios/scripts/build.sh ${{ inputs.godot_version }}
 
       - name: Package release zip
         run: |
-          cd HealthKitPlugin/build/output
+          cd platforms/ios/build/output
           zip -r "${{ github.workspace }}/HealthKitPlugin-${{ inputs.version }}-godot${{ inputs.godot_version }}.zip" .
 
       - name: Create GitHub Release

@@ -64,7 +64,7 @@ Requires macOS with Xcode and Python (for scons).
 pip install scons
 
 # Build for Godot 4.6.1
-./HealthKitPlugin/scripts/build.sh 4.6.1
+./platforms/ios/scripts/build.sh 4.6.1
 ```
 
 This will:
@@ -72,24 +72,25 @@ This will:
 2. Generate headers with scons
 3. Build Debug + Release static libraries with xcodebuild
 4. Create `.xcframework` bundles
-5. Copy output to `demo/ios/plugins/`
+5. Copy output to `platforms/godot_editor/ios/plugins/`
 
-Build output is in `HealthKitPlugin/build/output/`.
+Build output is in `platforms/ios/build/output/`.
 
 ## Demo Project
 
-The `demo/` directory contains a minimal Godot project that demonstrates all plugin APIs. It provides mock data when running on non-iOS platforms for easy editor testing.
+The `platforms/godot_editor/` directory contains a minimal Godot project that demonstrates all plugin APIs. It provides mock data when running on non-iOS platforms for easy editor testing.
 
 ## Project Structure
 
 ```
 godot-healthkit-plugin/
-  HealthKitPlugin/           # Plugin source
-    HealthKitPlugin/         # Native Objective-C++ code
-    HealthKitPlugin.xcodeproj/
-    HealthKitPlugin.gdip     # Plugin descriptor
-    scripts/                 # Build automation
-  demo/                      # Demo Godot project
+  platforms/
+    ios/                     # iOS Plugin source
+      HealthKitPlugin/       # Native Objective-C++ code
+      HealthKitPlugin.xcodeproj/
+      HealthKitPlugin.gdip   # Plugin descriptor
+      scripts/               # Build automation
+    godot_editor/            # Demo Godot project
   docs/                      # Documentation
   .github/workflows/         # CI/CD
 ```
