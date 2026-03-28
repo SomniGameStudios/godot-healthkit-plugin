@@ -26,7 +26,7 @@ jobs:
         run: pip install scons
 
       - name: Build plugin
-        run: ./HealthKitPlugin/scripts/build.sh ${{ github.event.inputs.godot_version || '4.6.1' }}
+        run: ./platforms/ios/scripts/build.sh ${{ github.event.inputs.godot_version || '4.6.1' }}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4

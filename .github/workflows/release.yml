@@ -32,7 +32,7 @@ jobs:
         run: pip install scons
 
       - name: Build plugin
-        run: ./HealthKitPlugin/scripts/build.sh ${{ inputs.godot_version }}
+        run: ./platforms/ios/scripts/build.sh ${{ inputs.godot_version }}
 
       - name: Package release zip
         run: |
