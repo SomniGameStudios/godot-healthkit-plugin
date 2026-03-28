@@ -15,7 +15,7 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source "$SCRIPT_DIR/common.sh"
 
 PLUGIN_DIR="$SCRIPT_DIR/.."
-PROJECT_ROOT="$PLUGIN_DIR/.."
+PROJECT_ROOT="$PLUGIN_DIR/../.."
 BUILD_DIR="$PLUGIN_DIR/build"
 OUTPUT_DIR="$BUILD_DIR/output"
 
@@ -98,4 +98,6 @@ if [ -d "$PROJECT_ROOT/demo" ]; then
     cp "$OUTPUT_DIR/HealthKitPlugin.gdip" "$DEMO_PLUGINS/"
     cp -r "$OUTPUT_DIR/HealthKitPlugin" "$DEMO_PLUGINS/"
     log_success "Demo project updated."
+fi
+g_success "Editor project updated."
 fi

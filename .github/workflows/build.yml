@@ -32,4 +32,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: HealthKitPlugin
-          path: HealthKitPlugin/build/output/
+          path: platforms/ios/build/output/
