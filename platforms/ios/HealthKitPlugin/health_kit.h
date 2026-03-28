@@ -21,6 +21,13 @@ public:
     void run_total_steps_walked_query();
     void run_period_steps_query(int days);
     
+    void request_permission();
+    int get_permission_status();
+    bool is_health_data_available();
+    
+    void start_step_observer();
+    void stop_step_observer();
+
     static HealthKit *get_singleton();
 
     HealthKit();
@@ -31,6 +38,7 @@ private:
     int total_steps = 0;
     std::map<String, int> period_steps;
     void* health_store = nullptr;
+    void* observer_query = nullptr;
 };
 
 #endif

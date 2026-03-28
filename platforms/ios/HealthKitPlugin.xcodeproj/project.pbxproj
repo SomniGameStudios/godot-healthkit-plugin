@@ -7,9 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		85243DD62E4B7C9C00D3BF06 /* ios_native.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85243DD52E4B7C9C00D3BF06 /* ios_native.mm */; };
-		C05C50142B4C9BB500F07DC3 /* iosbridge_module.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C05C50132B4C9BB500F07DC3 /* iosbridge_module.cpp */; };
-		C05C50152B4C9BB500F07DC3 /* iosbridge_module.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = C05C50122B4C9BB500F07DC3 /* iosbridge_module.h */; };
+		C05C50142B4C9BB500F07DC3 /* healthkit_plugin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C05C50132B4C9BB500F07DC3 /* healthkit_plugin.cpp */; };
+		C05C50152B4C9BB500F07DC3 /* healthkit_plugin.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = C05C50122B4C9BB500F07DC3 /* healthkit_plugin.h */; };
 		C05C501D2B4CA4FB00F07DC3 /* health_kit.mm in Sources */ = {isa = PBXBuildFile; fileRef = C05C501C2B4CA4FB00F07DC3 /* health_kit.mm */; };
 /* End PBXBuildFile section */
 
@@ -20,18 +19,16 @@
 			dstPath = "include/$(PRODUCT_NAME)";
 			dstSubfolderSpec = 16;
 			files = (
-				C05C50152B4C9BB500F07DC3 /* iosbridge_module.h in CopyFiles */,
+				C05C50152B4C9BB500F07DC3 /* healthkit_plugin.h in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		85243DD42E4B7C9000D3BF06 /* ios_native.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ios_native.h; sourceTree = "<group>"; };
-		85243DD52E4B7C9C00D3BF06 /* ios_native.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ios_native.mm; sourceTree = "<group>"; };
 		C05C500F2B4C9BB500F07DC3 /* libHealthKitPlugin.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libHealthKitPlugin.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		C05C50122B4C9BB500F07DC3 /* iosbridge_module.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = iosbridge_module.h; sourceTree = "<group>"; };
-		C05C50132B4C9BB500F07DC3 /* iosbridge_module.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = iosbridge_module.cpp; sourceTree = "<group>"; };
+		C05C50122B4C9BB500F07DC3 /* healthkit_plugin.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = healthkit_plugin.h; sourceTree = "<group>"; };
+		C05C50132B4C9BB500F07DC3 /* healthkit_plugin.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = healthkit_plugin.cpp; sourceTree = "<group>"; };
 		C05C501B2B4CA4D100F07DC3 /* health_kit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = health_kit.h; sourceTree = "<group>"; };
 		C05C501C2B4CA4FB00F07DC3 /* health_kit.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = health_kit.mm; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -66,12 +63,10 @@
 		C05C50112B4C9BB500F07DC3 /* HealthKitPlugin */ = {
 			isa = PBXGroup;
 			children = (
-				C05C50122B4C9BB500F07DC3 /* iosbridge_module.h */,
-				C05C50132B4C9BB500F07DC3 /* iosbridge_module.cpp */,
+				C05C50122B4C9BB500F07DC3 /* healthkit_plugin.h */,
+				C05C50132B4C9BB500F07DC3 /* healthkit_plugin.cpp */,
 				C05C501B2B4CA4D100F07DC3 /* health_kit.h */,
 				C05C501C2B4CA4FB00F07DC3 /* health_kit.mm */,
-				85243DD42E4B7C9000D3BF06 /* ios_native.h */,
-				85243DD52E4B7C9C00D3BF06 /* ios_native.mm */,
 			);
 			path = HealthKitPlugin;
 			sourceTree = "<group>";
@@ -134,8 +129,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C05C501D2B4CA4FB00F07DC3 /* health_kit.mm in Sources */,
-				85243DD62E4B7C9C00D3BF06 /* ios_native.mm in Sources */,
-				C05C50142B4C9BB500F07DC3 /* iosbridge_module.cpp in Sources */,
+				C05C50142B4C9BB500F07DC3 /* healthkit_plugin.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

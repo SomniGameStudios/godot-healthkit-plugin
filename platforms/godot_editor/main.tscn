@@ -53,17 +53,23 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 36
 text = "Get Period Steps (7 days)"
 
-[node name="TrackPermission" type="Button" parent="SafeAreaContainer/VBoxContainer" unique_id=1230069136]
+[node name="RequestPermission" type="Button" parent="SafeAreaContainer/VBoxContainer"]
 custom_minimum_size = Vector2(0, 80)
 layout_mode = 2
 theme_override_font_sizes/font_size = 36
-text = "Request Tracking Permission"
+text = "Request Permission"
 
-[node name="DebugMode" type="Button" parent="SafeAreaContainer/VBoxContainer" unique_id=1968824484]
+[node name="StartObserver" type="Button" parent="SafeAreaContainer/VBoxContainer"]
 custom_minimum_size = Vector2(0, 80)
 layout_mode = 2
 theme_override_font_sizes/font_size = 36
-text = "Check AdMob Debug Mode"
+text = "Start Observer"
+
+[node name="CheckStatus" type="Button" parent="SafeAreaContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+theme_override_font_sizes/font_size = 36
+text = "Check Permission Status"
 
 [node name="ResultLabel" type="Label" parent="SafeAreaContainer/VBoxContainer" unique_id=1082152538]
 layout_mode = 2
@@ -74,5 +80,6 @@ horizontal_alignment = 1
 [connection signal="pressed" from="SafeAreaContainer/VBoxContainer/TodaySteps" to="." method="_on_today_steps_pressed"]
 [connection signal="pressed" from="SafeAreaContainer/VBoxContainer/TotalSteps" to="." method="_on_total_steps_pressed"]
 [connection signal="pressed" from="SafeAreaContainer/VBoxContainer/PeriodSteps" to="." method="_on_period_steps_pressed"]
-[connection signal="pressed" from="SafeAreaContainer/VBoxContainer/TrackPermission" to="." method="_on_track_permission_pressed"]
-[connection signal="pressed" from="SafeAreaContainer/VBoxContainer/DebugMode" to="." method="_on_debug_mode_pressed"]
+[connection signal="pressed" from="SafeAreaContainer/VBoxContainer/RequestPermission" to="." method="_on_request_permission_pressed"]
+[connection signal="pressed" from="SafeAreaContainer/VBoxContainer/StartObserver" to="." method="_on_start_observer_pressed"]
+[connection signal="pressed" from="SafeAreaContainer/VBoxContainer/CheckStatus" to="." method="_on_check_status_pressed"]

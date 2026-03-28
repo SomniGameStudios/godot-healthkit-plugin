@@ -1,30 +1,58 @@
 extends Node
-## HealthKit autoload — wraps the iosHealthKit and iosNative singletons.
+## HealthKit autoload — wraps the GodotHealthKit singleton.
 ## On non-iOS platforms, returns mock data for editor testing.
 
+signal permission_result(granted: bool)
+signal steps_updated(steps: int)
+
 var _healthkit_plugin = null
-var _native_plugin = null
 var _is_ios: bool = false
 
 func _ready() -> void:
 	_is_ios = OS.get_name() == "iOS"
 
 	if _is_ios:
-		if Engine.has_singleton("iosHealthKit"):
-			_healthkit_plugin = Engine.get_singleton("iosHealthKit")
+		if Engine.has_singleton("GodotHealthKit"):
+			_healthkit_plugin = Engine.get_singleton("GodotHealthKit")
+			_healthkit_plugin.connect("permission_result", Callable(self, "_on_permission_result"))
+			_healthkit_plugin.connect("steps_updated", Callable(self, "_on_steps_updated"))
 			print("HealthKit: iOS plugin initialized")
 		else:
-			printerr("HealthKit: iosHealthKit singleton not found")
-
-		if Engine.has_singleton("iosNative"):
-			_native_plugin = Engine.get_singleton("iosNative")
-			print("HealthKit: iosNative plugin initialized")
-		else:
-			printerr("HealthKit: iosNative singleton not found")
+			printerr("HealthKit: GodotHealthKit singleton not found")
 	else:
 		print("HealthKit: Non-iOS platform, using mock data")
 
+func _on_permission_result(granted: bool) -> void:
+	permission_result.emit(granted)
+
+func _on_steps_updated(steps: int) -> void:
+	steps_updated.emit(steps)
+
 # --- HealthKit Methods ---
+
+func request_permission() -> void:
+	if _healthkit_plugin:
+		_healthkit_plugin.request_permission()
+	else:
+		call_deferred("emit_signal", "permission_result", true)
+
+func get_permission_status() -> int:
+	if _healthkit_plugin:
+		return _healthkit_plugin.get_permission_status()
+	return 2 # mock authorized (HKAuthorizationStatusSharingAuthorized)
+
+func is_health_data_available() -> bool:
+	if _healthkit_plugin:
+		return _healthkit_plugin.is_health_data_available()
+	return true
+
+func start_step_observer() -> void:
+	if _healthkit_plugin:
+		_healthkit_plugin.start_step_observer()
+
+func stop_step_observer() -> void:
+	if _healthkit_plugin:
+		_healthkit_plugin.stop_step_observer()
 
 func run_today_steps_query() -> void:
 	if _healthkit_plugin:
@@ -60,16 +88,3 @@ func get_period_steps_dict() -> Dictionary:
 		)
 		mock[date] = randi_range(2000, 12000)
 	return mock
-
-# --- Native Methods ---
-
-func request_track_permission() -> void:
-	if _native_plugin:
-		_native_plugin.request_track_permission()
-	else:
-		print("HealthKit: Track permission (mock - non-iOS)")
-
-func is_admob_debug_or_release() -> bool:
-	if _native_plugin:
-		return _native_plugin.is_admob_debug_or_release() == 1
-	return false
