@@ -11,6 +11,15 @@ void HealthKit::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_today_steps"), &HealthKit::get_today_steps);
     ClassDB::bind_method(D_METHOD("get_total_steps"), &HealthKit::get_total_steps);
     ClassDB::bind_method(D_METHOD("get_period_steps_dict"), &HealthKit::get_period_steps_dict);
+    
+    ClassDB::bind_method(D_METHOD("request_permission"), &HealthKit::request_permission);
+    ClassDB::bind_method(D_METHOD("get_permission_status"), &HealthKit::get_permission_status);
+    ClassDB::bind_method(D_METHOD("is_health_data_available"), &HealthKit::is_health_data_available);
+    ClassDB::bind_method(D_METHOD("start_step_observer"), &HealthKit::start_step_observer);
+    ClassDB::bind_method(D_METHOD("stop_step_observer"), &HealthKit::stop_step_observer);
+
+    ADD_SIGNAL(MethodInfo("permission_result", PropertyInfo(Variant::BOOL, "granted")));
+    ADD_SIGNAL(MethodInfo("steps_updated", PropertyInfo(Variant::INT, "steps")));
 }
 
 HealthKit *HealthKit::get_singleton() {
@@ -30,20 +39,6 @@ HealthKit::HealthKit() {
     
     HKHealthStore* store = [[HKHealthStore alloc] init];
     health_store = (void*)CFBridgingRetain(store);
-    
-    NSSet<HKSampleType*> *read_types = [NSSet setWithObject:
-                                        [HKQuantityType quantityTypeForIdentifier: HKQuantityTypeIdentifierStepCount]];
-    
-    [store requestAuthorizationToShareTypes:NULL readTypes:read_types
-                                completion:^(BOOL success, NSError * _Nullable error) {
-        if (!success) {
-            NSLog(@"Health data authorization failed: %@", error);
-            return;
-        }
-        NSLog(@"Health data authorization success");
-        run_today_steps_walked_query();
-        run_total_steps_walked_query();
-    }];
 }
 
 int HealthKit::get_today_steps() {
@@ -177,6 +172,109 @@ Dictionary HealthKit::get_period_steps_dict() {
         steps_data[entry.first] = entry.second;
     }
     return steps_data;
+}
+
+void HealthKit::request_permission() {
+    if (!health_store) {
+        instance->call_deferred("emit_signal", "permission_result", false);
+        return;
+    }
+    HKHealthStore* store = (__bridge HKHealthStore*)health_store;
+    
+    NSSet<HKSampleType*> *read_types = [NSSet setWithObject:[HKQuantityType quantityTypeForIdentifier:HKQuantityTypeIdentifierStepCount]];
+    
+    [store requestAuthorizationToShareTypes:NULL readTypes:read_types completion:^(BOOL success, NSError * _Nullable error) {
+        if (!success) {
+            NSLog(@"Health data authorization failed: %@", error);
+            instance->call_deferred("emit_signal", "permission_result", false);
+            return;
+        }
+        NSLog(@"Health data authorization success");
+        instance->call_deferred("emit_signal", "permission_result", true);
+        
+        instance->run_today_steps_walked_query();
+        instance->run_total_steps_walked_query();
+    }];
+}
+
+int HealthKit::get_permission_status() {
+    if (!health_store) return 0; // Not determined
+    HKHealthStore* store = (__bridge HKHealthStore*)health_store;
+    HKQuantityType *type = [HKSampleType quantityTypeForIdentifier:HKQuantityTypeIdentifierStepCount];
+    return (int)[store authorizationStatusForType:type];
+}
+
+bool HealthKit::is_health_data_available() {
+    return [HKHealthStore isHealthDataAvailable];
+}
+
+void HealthKit::start_step_observer() {
+    if (!health_store) return;
+    if (observer_query) return; // Already running
+
+    HKHealthStore* store = (__bridge HKHealthStore*)health_store;
+    HKQuantityType *type = [HKSampleType quantityTypeForIdentifier:HKQuantityTypeIdentifierStepCount];
+
+    // Enable background delivery
+    [store enableBackgroundDeliveryForType:type frequency:HKUpdateFrequencyImmediate withCompletion:^(BOOL success, NSError * _Nullable error) {
+        if (!success) {
+            NSLog(@"Failed to enable background delivery: %@", error);
+        } else {
+            NSLog(@"Successfully enabled background delivery");
+        }
+    }];
+
+    HKObserverQuery *query = [[HKObserverQuery alloc] initWithSampleType:type predicate:nil updateHandler:^(HKObserverQuery * _Nonnull query, HKObserverQueryCompletionHandler  _Nonnull completionHandler, NSError * _Nullable error) {
+        if (error) {
+            NSLog(@"Observer query error: %@", error);
+            if (completionHandler) {
+                completionHandler();
+            }
+            return;
+        }
+
+        // When notified of an update, we should query the latest step count
+        NSDate *today = [NSDate date];
+        NSDate *startOfDay = [[NSCalendar calendarWithIdentifier:NSCalendarIdentifierGregorian] startOfDayForDate:today];
+        NSPredicate *predicate = [HKQuery predicateForSamplesWithStartDate:startOfDay endDate:today options:HKQueryOptionStrictStartDate];
+        
+        HKStatisticsQuery *statsQuery = [[HKStatisticsQuery alloc] initWithQuantityType:type quantitySamplePredicate:predicate options:HKStatisticsOptionCumulativeSum completionHandler:^(HKStatisticsQuery * _Nonnull statsQuery, HKStatistics * _Nullable result, NSError * _Nullable statsError) {
+            if (statsError != nil) {
+                NSLog(@"Error querying steps in observer: %@", statsError);
+            } else {
+                double steps = [[result sumQuantity] doubleValueForUnit:[HKUnit countUnit]];
+                instance->today_steps = (int)steps;
+                instance->call_deferred("emit_signal", "steps_updated", (int)steps);
+            }
+            if (completionHandler) {
+                completionHandler();
+            }
+        }];
+        
+        [store executeQuery:statsQuery];
+    }];
+
+    observer_query = (void*)CFBridgingRetain(query);
+    [store executeQuery:query];
+}
+
+void HealthKit::stop_step_observer() {
+    if (!health_store || !observer_query) return;
+    
+    HKHealthStore* store = (__bridge HKHealthStore*)health_store;
+    HKObserverQuery* query = (__bridge HKObserverQuery*)observer_query;
+    
+    [store stopQuery:query];
+    
+    HKQuantityType *type = [HKSampleType quantityTypeForIdentifier:HKQuantityTypeIdentifierStepCount];
+    [store disableBackgroundDeliveryForType:type withCompletion:^(BOOL success, NSError * _Nullable error) {
+        if (!success) {
+            NSLog(@"Failed to disable background delivery: %@", error);
+        }
+    }];
+
+    CFBridgingRelease(observer_query);
+    observer_query = nullptr;
 }
 
 HealthKit::~HealthKit() {

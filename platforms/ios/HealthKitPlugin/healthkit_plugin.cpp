@@ -7,7 +7,7 @@ HealthKit *health_kit;
 
 void init_healthkit_plugin() {
     health_kit = memnew(HealthKit);
-    Engine::get_singleton()->add_singleton(Engine::Singleton("iosHealthKit", health_kit));
+    Engine::get_singleton()->add_singleton(Engine::Singleton("GodotHealthKit", health_kit));
 }
 
 void deinit_healthkit_plugin() {

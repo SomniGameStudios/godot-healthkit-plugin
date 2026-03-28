@@ -27,15 +27,29 @@ A Godot 4 iOS plugin that provides native HealthKit step counting and App Tracki
 
 ## GDScript API
 
-The plugin registers two singletons accessible via `Engine.get_singleton()`:
+The plugin registers a singleton accessible via `Engine.get_singleton()`:
 
-### `iosHealthKit`
+### `GodotHealthKit`
 
 ```gdscript
-if Engine.has_singleton("iosHealthKit"):
-    var hk = Engine.get_singleton("iosHealthKit")
+if Engine.has_singleton("GodotHealthKit"):
+    var hk = Engine.get_singleton("GodotHealthKit")
 
-    # Async queries (call first, then read result after ~1s)
+    # Connect to signals
+    hk.connect("permission_result", Callable(self, "_on_permission_result"))
+    hk.connect("steps_updated", Callable(self, "_on_steps_updated"))
+
+    # Request permission
+    hk.request_permission()
+
+    # Check permission and availability
+    var is_available: bool = hk.is_health_data_available()
+    var status: int = hk.get_permission_status()
+
+    # Start real-time observer and background delivery
+    hk.start_step_observer()
+
+    # Async snapshot queries (call first, then read result after ~1s)
     hk.run_today_steps_query()
     hk.run_total_steps_query()
     hk.run_period_steps_query(7)  # last 7 days
@@ -44,15 +58,6 @@ if Engine.has_singleton("iosHealthKit"):
     var today: int = hk.get_today_steps()
     var total: int = hk.get_total_steps()
     var period: Dictionary = hk.get_period_steps_dict()  # {"2026-03-15": 5432, ...}
-```
-
-### `iosNative`
-
-```gdscript
-if Engine.has_singleton("iosNative"):
-    var native = Engine.get_singleton("iosNative")
-    native.request_track_permission()
-    var is_debug: int = native.is_admob_debug_or_release()
 ```
 
 ## Building from Source

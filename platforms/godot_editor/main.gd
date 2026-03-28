@@ -2,6 +2,16 @@ extends Control
 
 @onready var result_label: Label = $SafeAreaContainer/VBoxContainer/ResultLabel
 
+func _ready() -> void:
+	HealthKit.permission_result.connect(_on_permission_result)
+	HealthKit.steps_updated.connect(_on_steps_updated)
+
+func _on_permission_result(granted: bool) -> void:
+	result_label.text = "Permission granted: " + str(granted)
+
+func _on_steps_updated(steps: int) -> void:
+	result_label.text = "Live steps update: %d" % steps
+
 func _on_today_steps_pressed() -> void:
 	HealthKit.run_today_steps_query()
 	# HealthKit queries are async — wait briefly then read
@@ -25,3 +35,16 @@ func _on_period_steps_pressed() -> void:
 	for date in keys:
 		text += "%s: %d\n" % [date, data[date]]
 	result_label.text = text
+
+func _on_request_permission_pressed() -> void:
+	HealthKit.request_permission()
+	result_label.text = "Requesting permission..."
+
+func _on_start_observer_pressed() -> void:
+	HealthKit.start_step_observer()
+	result_label.text = "Observer started. Walk to see live updates!"
+
+func _on_check_status_pressed() -> void:
+	var available = HealthKit.is_health_data_available()
+	var status = HealthKit.get_permission_status()
+	result_label.text = "Available: %s\nStatus Code: %d" % [str(available), status]
