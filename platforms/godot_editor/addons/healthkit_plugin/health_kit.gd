@@ -60,16 +60,6 @@ func get_period_steps_dict() -> Dictionary:
 		)
 		mock[date] = randi_range(2000, 12000)
 	return mock
-
-# --- Native Methods ---
-
-func request_track_permission() -> void:
-	if _native_plugin:
-		_native_plugin.request_track_permission()
-	else:
-		print("HealthKit: Track permission (mock - non-iOS)")
-
-func is_admob_debug_or_release() -> bool:
-	if _native_plugin:
+ugin:
 		return _native_plugin.is_admob_debug_or_release() == 1
 	return false

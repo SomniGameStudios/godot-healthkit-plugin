@@ -25,11 +25,3 @@ func _on_period_steps_pressed() -> void:
 	for date in keys:
 		text += "%s: %d\n" % [date, data[date]]
 	result_label.text = text
-
-func _on_track_permission_pressed() -> void:
-	HealthKit.request_track_permission()
-	result_label.text = "Tracking permission requested"
-
-func _on_debug_mode_pressed() -> void:
-	var is_debug = HealthKit.is_admob_debug_or_release()
-	result_label.text = "AdMob debug mode: %s" % str(is_debug)
