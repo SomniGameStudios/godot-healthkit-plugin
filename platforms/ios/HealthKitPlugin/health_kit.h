@@ -4,6 +4,7 @@
 #include "core/version.h"
 #include "core/object/class_db.h"
 #include <map>
+#include <mutex>
 
 class HealthKit : public Object {
 
@@ -40,6 +41,7 @@ private:
     std::map<String, int> period_steps;
     void* health_store = nullptr;
     void* observer_query = nullptr;
+    std::mutex data_mutex;
 };
 
 #endif

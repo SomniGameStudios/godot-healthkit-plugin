@@ -43,7 +43,7 @@ func _get_health_block() -> String:
 	return "\t<key>com.apple.developer.healthkit</key>\n\t<true/>\n\t<key>com.apple.developer.healthkit.background-delivery</key>\n\t<true/>\n"
 
 func _get_privacy_block() -> String:
-	return "\t<key>NSHealthShareUsageDescription</key>\n\t<string>Access to your health data is required for this plugin demo.</string>\n\t<key>NSHealthUpdateUsageDescription</key>\n\t<string>Access to your health data is required for this plugin demo.</string>\n"
+	return "\t<key>NSHealthShareUsageDescription</key>\n\t<string>Access to your health data is required for this plugin demo.</string>\n\t<key>NSHealthUpdateUsageDescription</key>\n\t<string>Access to your health data is required for this plugin demo.</string>\n\t<key>LSApplicationQueriesSchemes</key>\n\t<array>\n\t\t<string>x-apple-health</string>\n\t</array>\n"
 
 func _find_files_with_extension(path: String, extension: String) -> Array:
 	var results := []
