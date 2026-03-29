@@ -242,7 +242,10 @@ void HealthKit::start_step_observer() {
             if (statsError != nil) {
                 NSLog(@"Error querying steps in observer: %@", statsError);
             } else {
-                double steps = [[result sumQuantity] doubleValueForUnit:[HKUnit countUnit]];
+                double steps = 0;
+                if (result.sumQuantity) {
+                    steps = [[result sumQuantity] doubleValueForUnit:[HKUnit countUnit]];
+                }
                 instance->today_steps = (int)steps;
                 instance->call_deferred("emit_signal", "steps_updated", (int)steps);
             }

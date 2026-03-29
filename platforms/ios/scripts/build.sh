@@ -40,7 +40,7 @@ log_info "Step 2/4: Generating Godot headers..."
 # Step 3: Build with xcodebuild (Debug + Release)
 log_info "Step 3/4: Building static libraries..."
 
-rm -rf "$BUILD_DIR"
+rm -rf "$BUILD_DIR"; rm -rf ~/Library/Developer/Xcode/DerivedData/HealthKitPlugin-*
 mkdir -p "$OUTPUT_DIR/HealthKitPlugin/bin"
 
 for CONFIG in Debug Release; do
@@ -50,12 +50,13 @@ for CONFIG in Debug Release; do
 
     log_info "Building $CONFIG configuration for device..."
 
-    xcodebuild archive \
+    xcodebuild archive IPHONEOS_DEPLOYMENT_TARGET=14.0 \
         -project "$PLUGIN_DIR/HealthKitPlugin.xcodeproj" \
         -scheme HealthKitPlugin \
-        -destination "generic/platform=iOS" \
+        SDKROOT=iphoneos -destination "generic/platform=iOS" \
         -archivePath "$DEVICE_ARCHIVE_PATH" \
         -configuration "$CONFIG" \
+        ARCHS="arm64" \
         SKIP_INSTALL=NO \
         BUILD_LIBRARY_FOR_DISTRIBUTION=YES \
         CODE_SIGNING_REQUIRED=NO \
@@ -65,12 +66,14 @@ for CONFIG in Debug Release; do
 
     log_info "Building $CONFIG configuration for simulator..."
 
-    xcodebuild archive \
+    xcodebuild archive IPHONEOS_DEPLOYMENT_TARGET=14.0 \
         -project "$PLUGIN_DIR/HealthKitPlugin.xcodeproj" \
         -scheme HealthKitPlugin \
-        -destination "generic/platform=iOS Simulator" \
+        SDKROOT=iphonesimulator -destination "generic/platform=iOS Simulator" \
         -archivePath "$SIMULATOR_ARCHIVE_PATH" \
         -configuration "$CONFIG" \
+        ARCHS="arm64 x86_64" \
+        OTHER_LDFLAGS="-Wl,-weak_framework,SwiftUICore -Wl,-no_warn_duplicate_libraries" \
         SKIP_INSTALL=NO \
         BUILD_LIBRARY_FOR_DISTRIBUTION=YES \
         CODE_SIGNING_REQUIRED=NO \
