@@ -6,6 +6,11 @@ func _ready() -> void:
 	HealthKit.permission_result.connect(_on_permission_result)
 	HealthKit.steps_updated.connect(_on_steps_updated)
 
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_APPLICATION_RESUMED:
+		# Automatically refresh when returning from Settings app
+		_on_today_steps_pressed()
+
 func _on_permission_result(granted: bool) -> void:
 	result_label.text = "Permission granted: " + str(granted)
 
@@ -48,3 +53,7 @@ func _on_check_status_pressed() -> void:
 	var available = HealthKit.is_health_data_available()
 	var status = HealthKit.get_permission_status()
 	result_label.text = "Available: %s\nStatus Code: %d" % [str(available), status]
+
+func _on_manage_permissions_pressed() -> void:
+	HealthKit.open_settings()
+	result_label.text = "Opening System Settings..."

@@ -58,6 +58,12 @@ func run_today_steps_query() -> void:
 	if _healthkit_plugin:
 		_healthkit_plugin.run_today_steps_query()
 
+func open_settings() -> void:
+	if _healthkit_plugin:
+		_healthkit_plugin.open_settings()
+	else:
+		print("HealthKit: Mock open_settings() called")
+
 func get_today_steps() -> int:
 	if _healthkit_plugin:
 		return _healthkit_plugin.get_today_steps()

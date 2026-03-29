@@ -1,6 +1,7 @@
 #import "health_kit.h"
 #include <Foundation/NSDate.h>
 #include <HealthKit/HealthKit.h>
+#import <UIKit/UIKit.h>
 
 HealthKit *HealthKit::instance = NULL;
 
@@ -15,6 +16,7 @@ void HealthKit::_bind_methods() {
     ClassDB::bind_method(D_METHOD("request_permission"), &HealthKit::request_permission);
     ClassDB::bind_method(D_METHOD("get_permission_status"), &HealthKit::get_permission_status);
     ClassDB::bind_method(D_METHOD("is_health_data_available"), &HealthKit::is_health_data_available);
+    ClassDB::bind_method(D_METHOD("open_settings"), &HealthKit::open_settings);
     ClassDB::bind_method(D_METHOD("start_step_observer"), &HealthKit::start_step_observer);
     ClassDB::bind_method(D_METHOD("stop_step_observer"), &HealthKit::stop_step_observer);
 
@@ -180,10 +182,19 @@ void HealthKit::request_permission() {
         return;
     }
     HKHealthStore* store = (__bridge HKHealthStore*)health_store;
+    HKQuantityType *stepType = [HKQuantityType quantityTypeForIdentifier:HKQuantityTypeIdentifierStepCount];
+
+    // Check if we are already authorized for reading/sharing
+    if ([store authorizationStatusForType:stepType] == HKAuthorizationStatusSharingAuthorized) {
+        NSLog(@"HealthKit: Already fully authorized, skipping prompt.");
+        instance->call_deferred("emit_signal", "permission_result", true);
+        return;
+    }
     
-    NSSet<HKSampleType*> *read_types = [NSSet setWithObject:[HKQuantityType quantityTypeForIdentifier:HKQuantityTypeIdentifierStepCount]];
+    NSSet<HKSampleType*> *read_types = [NSSet setWithObject:stepType];
+    NSSet<HKSampleType*> *share_types = [NSSet setWithObject:stepType]; // Trick: adding share permission forces a new prompt if previously only read was asked
     
-    [store requestAuthorizationToShareTypes:NULL readTypes:read_types completion:^(BOOL success, NSError * _Nullable error) {
+    [store requestAuthorizationToShareTypes:share_types readTypes:read_types completion:^(BOOL success, NSError * _Nullable error) {
         if (!success) {
             NSLog(@"Health data authorization failed: %@", error);
             instance->call_deferred("emit_signal", "permission_result", false);
@@ -206,6 +217,13 @@ int HealthKit::get_permission_status() {
 
 bool HealthKit::is_health_data_available() {
     return [HKHealthStore isHealthDataAvailable];
+}
+
+void HealthKit::open_settings() {
+    NSURL *url = [NSURL URLWithString:UIApplicationOpenSettingsURLString];
+    if ([[UIApplication sharedApplication] canOpenURL:url]) {
+        [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
+    }
 }
 
 void HealthKit::start_step_observer() {

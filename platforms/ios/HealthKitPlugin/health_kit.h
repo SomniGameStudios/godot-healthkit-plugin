@@ -24,6 +24,7 @@ public:
     void request_permission();
     int get_permission_status();
     bool is_health_data_available();
+    void open_settings();
     
     void start_step_observer();
     void stop_step_observer();
