@@ -40,21 +40,23 @@ log_info "Step 2/4: Generating Godot headers..."
 # Step 3: Build with xcodebuild (Debug + Release)
 log_info "Step 3/4: Building static libraries..."
 
-rm -rf "$BUILD_DIR"
+rm -rf "$BUILD_DIR"; rm -rf ~/Library/Developer/Xcode/DerivedData/HealthKitPlugin-*
 mkdir -p "$OUTPUT_DIR/HealthKitPlugin/bin"
 
 for CONFIG in Debug Release; do
     CONFIG_LOWER=$(echo "$CONFIG" | tr '[:upper:]' '[:lower:]')
-    ARCHIVE_PATH="$BUILD_DIR/ios-device-${CONFIG_LOWER}"
+    DEVICE_ARCHIVE_PATH="$BUILD_DIR/ios-device-${CONFIG_LOWER}"
+    SIMULATOR_ARCHIVE_PATH="$BUILD_DIR/ios-simulator-${CONFIG_LOWER}"
 
-    log_info "Building $CONFIG configuration..."
+    log_info "Building $CONFIG configuration for device..."
 
-    xcodebuild archive \
+    xcodebuild archive IPHONEOS_DEPLOYMENT_TARGET=14.0 \
         -project "$PLUGIN_DIR/HealthKitPlugin.xcodeproj" \
         -scheme HealthKitPlugin \
-        -destination "generic/platform=iOS" \
-        -archivePath "$ARCHIVE_PATH" \
+        SDKROOT=iphoneos -destination "generic/platform=iOS" \
+        -archivePath "$DEVICE_ARCHIVE_PATH" \
         -configuration "$CONFIG" \
+        ARCHS="arm64" \
         SKIP_INSTALL=NO \
         BUILD_LIBRARY_FOR_DISTRIBUTION=YES \
         CODE_SIGNING_REQUIRED=NO \
@@ -62,10 +64,33 @@ for CONFIG in Debug Release; do
         DEVELOPMENT_TEAM="" \
         | tail -20
 
-    # Locate the built .a file
-    LIB_PATH="$ARCHIVE_PATH.xcarchive/Products/usr/local/lib/libHealthKitPlugin.a"
-    if [ ! -f "$LIB_PATH" ]; then
-        log_error "Built library not found at $LIB_PATH"
+    log_info "Building $CONFIG configuration for simulator..."
+
+    xcodebuild archive IPHONEOS_DEPLOYMENT_TARGET=14.0 \
+        -project "$PLUGIN_DIR/HealthKitPlugin.xcodeproj" \
+        -scheme HealthKitPlugin \
+        SDKROOT=iphonesimulator -destination "generic/platform=iOS Simulator" \
+        -archivePath "$SIMULATOR_ARCHIVE_PATH" \
+        -configuration "$CONFIG" \
+        ARCHS="arm64 x86_64" \
+        OTHER_LDFLAGS="-Wl,-weak_framework,SwiftUICore -Wl,-no_warn_duplicate_libraries" \
+        SKIP_INSTALL=NO \
+        BUILD_LIBRARY_FOR_DISTRIBUTION=YES \
+        CODE_SIGNING_REQUIRED=NO \
+        CODE_SIGNING_ALLOWED=NO \
+        DEVELOPMENT_TEAM="" \
+        | tail -20
+
+    # Locate the built .a files
+    DEVICE_LIB_PATH="$DEVICE_ARCHIVE_PATH.xcarchive/Products/usr/local/lib/libHealthKitPlugin.a"
+    if [ ! -f "$DEVICE_LIB_PATH" ]; then
+        log_error "Built device library not found at $DEVICE_LIB_PATH"
+        exit 1
+    fi
+
+    SIMULATOR_LIB_PATH="$SIMULATOR_ARCHIVE_PATH.xcarchive/Products/usr/local/lib/libHealthKitPlugin.a"
+    if [ ! -f "$SIMULATOR_LIB_PATH" ]; then
+        log_error "Built simulator library not found at $SIMULATOR_LIB_PATH"
         exit 1
     fi
 
@@ -74,7 +99,8 @@ for CONFIG in Debug Release; do
     log_info "Creating $CONFIG_LOWER xcframework..."
 
     xcodebuild -create-xcframework \
-        -library "$LIB_PATH" \
+        -library "$DEVICE_LIB_PATH" \
+        -library "$SIMULATOR_LIB_PATH" \
         -output "$XCFRAMEWORK_PATH"
 
     log_success "$CONFIG xcframework created."

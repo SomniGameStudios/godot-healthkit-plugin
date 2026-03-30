@@ -30,6 +30,10 @@ window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
 window/handheld/orientation=1
 
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/healthkit_plugin/plugin.cfg")
+
 [rendering]
 
 renderer/rendering_method="gl_compatibility"

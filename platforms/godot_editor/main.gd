@@ -1,10 +1,17 @@
 extends Control
 
-@onready var result_label: Label = $SafeAreaContainer/VBoxContainer/ResultLabel
+@onready var result_label: Label = $SafeAreaContainer/ScrollContainer/VBoxContainer/ResultLabel
 
 func _ready() -> void:
 	HealthKit.permission_result.connect(_on_permission_result)
 	HealthKit.steps_updated.connect(_on_steps_updated)
+	# Set default color for light theme
+	result_label.add_theme_color_override("font_color", Color.BLACK)
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_APPLICATION_RESUMED:
+		# Automatically refresh when returning from Settings app
+		_on_today_steps_pressed()
 
 func _on_permission_result(granted: bool) -> void:
 	result_label.text = "Permission granted: " + str(granted)
@@ -14,23 +21,19 @@ func _on_steps_updated(steps: int) -> void:
 
 func _on_today_steps_pressed() -> void:
 	HealthKit.run_today_steps_query()
-	# HealthKit queries are async — wait briefly then read
-	await get_tree().create_timer(1.0).timeout
-	var steps = HealthKit.get_today_steps()
+	var steps: int = await HealthKit.today_steps_ready
 	result_label.text = "Today's steps: %d" % steps
 
 func _on_total_steps_pressed() -> void:
 	HealthKit.run_total_steps_query()
-	await get_tree().create_timer(1.0).timeout
-	var steps = HealthKit.get_total_steps()
+	var steps: int = await HealthKit.total_steps_ready
 	result_label.text = "Total steps: %d" % steps
 
 func _on_period_steps_pressed() -> void:
 	HealthKit.run_period_steps_query(7)
-	await get_tree().create_timer(1.0).timeout
-	var data = HealthKit.get_period_steps_dict()
-	var text = "Steps (last 7 days):\n"
-	var keys = data.keys()
+	var data: Dictionary = await HealthKit.period_steps_ready
+	var text := "Steps (last 7 days):\n"
+	var keys := data.keys()
 	keys.sort()
 	for date in keys:
 		text += "%s: %d\n" % [date, data[date]]
@@ -45,6 +48,22 @@ func _on_start_observer_pressed() -> void:
 	result_label.text = "Observer started. Walk to see live updates!"
 
 func _on_check_status_pressed() -> void:
-	var available = HealthKit.is_health_data_available()
+	var available := HealthKit.is_health_data_available()
 	var status = HealthKit.get_permission_status()
-	result_label.text = "Available: %s\nStatus Code: %d" % [str(available), status]
+	result_label.add_theme_color_override("font_color", Color.BLACK)
+	
+	if status == HealthKit.AuthorizationStatus.NOT_DETERMINED:
+		result_label.text = "HealthKit Available: %s\nStatus: Not Requested / Determined" % str(available).to_upper()
+		return
+		
+	result_label.text = "HealthKit Available: %s\nVerifying read access..." % str(available).to_upper()
+	
+	HealthKit.run_today_steps_query()
+	var steps: int = await HealthKit.today_steps_ready
+	
+	result_label.text = "HealthKit Available: %s\nRead Access: Granted\nToday's Steps: %d" % [str(available).to_upper(), steps]
+	result_label.add_theme_color_override("font_color", Color.SEA_GREEN)
+
+func _on_manage_permissions_pressed() -> void:
+	HealthKit.open_settings()
+	result_label.text = "Opening System Settings..."

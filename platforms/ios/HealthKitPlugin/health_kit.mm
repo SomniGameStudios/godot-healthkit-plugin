@@ -1,6 +1,7 @@
 #import "health_kit.h"
 #include <Foundation/NSDate.h>
 #include <HealthKit/HealthKit.h>
+#import <UIKit/UIKit.h>
 
 HealthKit *HealthKit::instance = NULL;
 
@@ -15,11 +16,16 @@ void HealthKit::_bind_methods() {
     ClassDB::bind_method(D_METHOD("request_permission"), &HealthKit::request_permission);
     ClassDB::bind_method(D_METHOD("get_permission_status"), &HealthKit::get_permission_status);
     ClassDB::bind_method(D_METHOD("is_health_data_available"), &HealthKit::is_health_data_available);
+    ClassDB::bind_method(D_METHOD("open_settings"), &HealthKit::open_settings);
     ClassDB::bind_method(D_METHOD("start_step_observer"), &HealthKit::start_step_observer);
     ClassDB::bind_method(D_METHOD("stop_step_observer"), &HealthKit::stop_step_observer);
 
     ADD_SIGNAL(MethodInfo("permission_result", PropertyInfo(Variant::BOOL, "granted")));
     ADD_SIGNAL(MethodInfo("steps_updated", PropertyInfo(Variant::INT, "steps")));
+
+    ADD_SIGNAL(MethodInfo("today_steps_ready", PropertyInfo(Variant::INT, "steps")));
+    ADD_SIGNAL(MethodInfo("total_steps_ready", PropertyInfo(Variant::INT, "steps")));
+    ADD_SIGNAL(MethodInfo("period_steps_ready", PropertyInfo(Variant::DICTIONARY, "steps_dict")));
 }
 
 HealthKit *HealthKit::get_singleton() {
@@ -43,11 +49,13 @@ HealthKit::HealthKit() {
 
 int HealthKit::get_today_steps() {
     NSLog(@"In HealthKit get today walked");
+    std::lock_guard<std::mutex> lock(data_mutex);
     return today_steps;
 }
 
 int HealthKit::get_total_steps() {
     NSLog(@"In HealthKit get total steps walked");
+    std::lock_guard<std::mutex> lock(data_mutex);
     return total_steps;
 }
 
@@ -69,11 +77,20 @@ void HealthKit::run_today_steps_walked_query() {
                                 completionHandler:^(HKStatisticsQuery * _Nonnull query, HKStatistics * _Nullable result, NSError * _Nullable error) {
         
         if (error != nil) {
-            NSLog(@"Error with today's steps: %@", error);
+            NSLog(@"Error with today's steps: %@. Defaulting to 0.", error);
+            {
+                std::lock_guard<std::mutex> lock(instance->data_mutex);
+                instance->today_steps = 0;
+            }
+            instance->call_deferred("emit_signal", "today_steps_ready", 0);
         } else {
             double steps = [[result sumQuantity] doubleValueForUnit:[HKUnit countUnit]];
             NSLog(@"Today's steps: %f", steps);
-            instance->today_steps = (int)steps;
+            {
+                std::lock_guard<std::mutex> lock(instance->data_mutex);
+                instance->today_steps = (int)steps;
+            }
+            instance->call_deferred("emit_signal", "today_steps_ready", (int)steps);
         }
     }];
     
@@ -84,17 +101,7 @@ void HealthKit::run_total_steps_walked_query() {
     if (!health_store) return;
     HKHealthStore* store = (__bridge HKHealthStore*)health_store;
 
-    NSDateComponents *components = [[NSDateComponents alloc] init];
-    [components setDay:1];
-    [components setMonth:1]; // January
-    [components setYear:2024];
-    [components setHour:0];
-    [components setMinute:0];
-    [components setSecond:0];
-    [components setTimeZone:[NSTimeZone timeZoneWithName:@"UTC"]];
-    NSCalendar *calendar = [NSCalendar calendarWithIdentifier:NSCalendarIdentifierGregorian];
-    
-    NSDate *start = [calendar dateFromComponents:components];
+    NSDate *start = [NSDate distantPast];
     NSDate *end = [NSDate date];
     
     HKQuantityType *type = [HKSampleType quantityTypeForIdentifier:HKQuantityTypeIdentifierStepCount];
@@ -103,11 +110,20 @@ void HealthKit::run_total_steps_walked_query() {
     HKStatisticsQuery *query = [[HKStatisticsQuery alloc] initWithQuantityType:type quantitySamplePredicate:predicate options:HKStatisticsOptionCumulativeSum completionHandler:^(HKStatisticsQuery * _Nonnull query, HKStatistics * _Nullable result, NSError * _Nullable error) {
         
         if (error != nil) {
-            NSLog(@"Error with total steps: %@", error);
+            NSLog(@"Error with total steps: %@. Defaulting to 0.", error);
+            {
+                std::lock_guard<std::mutex> lock(instance->data_mutex);
+                instance->total_steps = 0;
+            }
+            instance->call_deferred("emit_signal", "total_steps_ready", 0);
         } else {
             double steps = [[result sumQuantity] doubleValueForUnit:[HKUnit countUnit]];
             NSLog(@"Total steps since epoch %f", steps);
-            instance->total_steps = (int)steps;
+            {
+                std::lock_guard<std::mutex> lock(instance->data_mutex);
+                instance->total_steps = (int)steps;
+            }
+            instance->call_deferred("emit_signal", "total_steps_ready", (int)steps);
         }
     }];
     
@@ -145,22 +161,28 @@ void HealthKit::run_period_steps_query(int days) {
             return;
         }
 
-        instance->period_steps.clear();
+        Dictionary steps_data;
+        {
+            std::lock_guard<std::mutex> lock(instance->data_mutex);
+            instance->period_steps.clear();
 
-        [results enumerateStatisticsFromDate:startDate toDate:now withBlock:^(HKStatistics * _Nonnull statistics, BOOL * _Nonnull stop) {
-            if (statistics.sumQuantity) {
-                double steps = [statistics.sumQuantity doubleValueForUnit:[HKUnit countUnit]];
-                NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
-                [formatter setDateFormat:@"yyyy-MM-dd"];
-                NSString *dateStr = [formatter stringFromDate:statistics.startDate];
-                instance->period_steps[dateStr.UTF8String] = (int)steps;
+            [results enumerateStatisticsFromDate:startDate toDate:now withBlock:^(HKStatistics * _Nonnull statistics, BOOL * _Nonnull stop) {
+                if (statistics.sumQuantity) {
+                    double steps = [statistics.sumQuantity doubleValueForUnit:[HKUnit countUnit]];
+                    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+                    [formatter setDateFormat:@"yyyy-MM-dd"];
+                    NSString *dateStr = [formatter stringFromDate:statistics.startDate];
+                    instance->period_steps[dateStr.UTF8String] = (int)steps;
+                }
+            }];
+
+            for (const auto& entry : instance->period_steps) {
+                NSString *key = [NSString stringWithUTF8String:entry.first.utf8().get_data()];
+                NSLog(@"Period steps entry: %@ -> %d", key, entry.second);
+                steps_data[entry.first] = entry.second;
             }
-        }];
-
-        for (const auto& entry : instance->period_steps) {
-            NSString *key = [NSString stringWithUTF8String:entry.first.utf8().get_data()];
-            NSLog(@"Period steps entry: %@ -> %d", key, entry.second);
         }
+        instance->call_deferred("emit_signal", "period_steps_ready", steps_data);
     };
 
     [store executeQuery:query];
@@ -168,6 +190,7 @@ void HealthKit::run_period_steps_query(int days) {
 
 Dictionary HealthKit::get_period_steps_dict() {
     Dictionary steps_data;
+    std::lock_guard<std::mutex> lock(data_mutex);
     for (const auto& entry : period_steps) {
         steps_data[entry.first] = entry.second;
     }
@@ -180,10 +203,11 @@ void HealthKit::request_permission() {
         return;
     }
     HKHealthStore* store = (__bridge HKHealthStore*)health_store;
+    HKQuantityType *stepType = [HKQuantityType quantityTypeForIdentifier:HKQuantityTypeIdentifierStepCount];
+
+    NSSet<HKSampleType*> *read_types = [NSSet setWithObject:stepType];
     
-    NSSet<HKSampleType*> *read_types = [NSSet setWithObject:[HKQuantityType quantityTypeForIdentifier:HKQuantityTypeIdentifierStepCount]];
-    
-    [store requestAuthorizationToShareTypes:NULL readTypes:read_types completion:^(BOOL success, NSError * _Nullable error) {
+    [store requestAuthorizationToShareTypes:nil readTypes:read_types completion:^(BOOL success, NSError * _Nullable error) {
         if (!success) {
             NSLog(@"Health data authorization failed: %@", error);
             instance->call_deferred("emit_signal", "permission_result", false);
@@ -206,6 +230,21 @@ int HealthKit::get_permission_status() {
 
 bool HealthKit::is_health_data_available() {
     return [HKHealthStore isHealthDataAvailable];
+}
+
+void HealthKit::open_settings() {
+    // Primary: Try to open the Apple Health app directly
+    NSURL *healthAppUrl = [NSURL URLWithString:@"x-apple-health://"];
+    if ([[UIApplication sharedApplication] canOpenURL:healthAppUrl]) {
+        [[UIApplication sharedApplication] openURL:healthAppUrl options:@{} completionHandler:nil];
+        return;
+    } 
+    
+    // Fallback: Open the App's own specific Settings page
+    NSURL *appSettingsUrl = [NSURL URLWithString:UIApplicationOpenSettingsURLString];
+    if ([[UIApplication sharedApplication] canOpenURL:appSettingsUrl]) {
+        [[UIApplication sharedApplication] openURL:appSettingsUrl options:@{} completionHandler:nil];
+    }
 }
 
 void HealthKit::start_step_observer() {
@@ -242,7 +281,11 @@ void HealthKit::start_step_observer() {
             if (statsError != nil) {
                 NSLog(@"Error querying steps in observer: %@", statsError);
             } else {
-                double steps = [[result sumQuantity] doubleValueForUnit:[HKUnit countUnit]];
+                double steps = 0;
+                if (result.sumQuantity) {
+                    steps = [[result sumQuantity] doubleValueForUnit:[HKUnit countUnit]];
+                }
+                std::lock_guard<std::mutex> lock(instance->data_mutex);
                 instance->today_steps = (int)steps;
                 instance->call_deferred("emit_signal", "steps_updated", (int)steps);
             }
@@ -278,6 +321,10 @@ void HealthKit::stop_step_observer() {
 }
 
 HealthKit::~HealthKit() {
+    if (observer_query) {
+        CFBridgingRelease(observer_query);
+        observer_query = nullptr;
+    }
     if (health_store) {
         CFBridgingRelease(health_store);
         health_store = nullptr;

@@ -1,9 +1,45 @@
-[gd_scene format=3 uid="uid://cii7r0tlrlqoo"]
+[gd_scene load_steps=6 format=3 uid="uid://cii7r0tlrlqoo"]
 
 [ext_resource type="Script" uid="uid://dc5kywrohbr0v" path="res://main.gd" id="1_main"]
 [ext_resource type="Script" uid="uid://dbg2y32gc1ybd" path="res://scenes/safe_area_container.gd" id="2_safe_area"]
 
-[node name="Main" type="Control" unique_id=557561218]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_card"]
+content_margin_left = 20.0
+content_margin_top = 20.0
+content_margin_right = 20.0
+content_margin_bottom = 20.0
+bg_color = Color(1, 1, 1, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+shadow_color = Color(0, 0, 0, 0.05)
+shadow_size = 10
+shadow_offset = Vector2(0, 4)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button"]
+content_margin_left = 15.0
+content_margin_top = 15.0
+content_margin_right = 15.0
+content_margin_bottom = 15.0
+bg_color = Color(0, 0.478431, 1, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button_grey"]
+content_margin_left = 15.0
+content_margin_top = 15.0
+content_margin_right = 15.0
+content_margin_bottom = 15.0
+bg_color = Color(0.898039, 0.898039, 0.917647, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[node name="Main" type="Control"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -12,74 +48,136 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_main")
 
-[node name="SafeAreaContainer" type="MarginContainer" parent="." unique_id=24036684]
+[node name="Background" type="ColorRect" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/margin_left = 60
-theme_override_constants/margin_right = 60
-theme_override_constants/margin_bottom = 30
+color = Color(0.94902, 0.94902, 0.968627, 1)
+
+[node name="SafeAreaContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 24
 script = ExtResource("2_safe_area")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="SafeAreaContainer" unique_id=1589212888]
+[node name="ScrollContainer" type="ScrollContainer" parent="SafeAreaContainer"]
 layout_mode = 2
-theme_override_constants/separation = 40
-alignment = 1
+horizontal_scroll_mode = 0
 
-[node name="Title" type="Label" parent="SafeAreaContainer/VBoxContainer" unique_id=705612306]
+[node name="VBoxContainer" type="VBoxContainer" parent="SafeAreaContainer/ScrollContainer"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 42
-text = "HealthKit Plugin Demo"
+size_flags_horizontal = 3
+theme_override_constants/separation = 30
+alignment = 0
+
+[node name="Title" type="Label" parent="SafeAreaContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 48
+text = "HealthKit Plugin"
 horizontal_alignment = 1
 
-[node name="TodaySteps" type="Button" parent="SafeAreaContainer/VBoxContainer" unique_id=1715006200]
-custom_minimum_size = Vector2(0, 80)
+[node name="DataCard" type="PanelContainer" parent="SafeAreaContainer/ScrollContainer/VBoxContainer"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 36
-text = "Get Today's Steps"
+theme_override_styles/panel = SubResource("StyleBoxFlat_card")
 
-[node name="TotalSteps" type="Button" parent="SafeAreaContainer/VBoxContainer" unique_id=1044139786]
-custom_minimum_size = Vector2(0, 80)
+[node name="VBox" type="VBoxContainer" parent="SafeAreaContainer/ScrollContainer/VBoxContainer/DataCard"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 36
-text = "Get Total Steps"
+theme_override_constants/separation = 15
 
-[node name="PeriodSteps" type="Button" parent="SafeAreaContainer/VBoxContainer" unique_id=1582353958]
-custom_minimum_size = Vector2(0, 80)
+[node name="Label" type="Label" parent="SafeAreaContainer/ScrollContainer/VBoxContainer/DataCard/VBox"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 36
-text = "Get Period Steps (7 days)"
+theme_override_colors/font_color = Color(0.235294, 0.235294, 0.262745, 1)
+theme_override_font_sizes/font_size = 28
+text = "ACTIVITY QUERIES"
 
-[node name="RequestPermission" type="Button" parent="SafeAreaContainer/VBoxContainer"]
-custom_minimum_size = Vector2(0, 80)
-layout_mode = 2
-theme_override_font_sizes/font_size = 36
-text = "Request Permission"
-
-[node name="StartObserver" type="Button" parent="SafeAreaContainer/VBoxContainer"]
-custom_minimum_size = Vector2(0, 80)
-layout_mode = 2
-theme_override_font_sizes/font_size = 36
-text = "Start Observer"
-
-[node name="CheckStatus" type="Button" parent="SafeAreaContainer/VBoxContainer"]
-custom_minimum_size = Vector2(0, 80)
-layout_mode = 2
-theme_override_font_sizes/font_size = 36
-text = "Check Permission Status"
-
-[node name="ResultLabel" type="Label" parent="SafeAreaContainer/VBoxContainer" unique_id=1082152538]
+[node name="TodaySteps" type="Button" parent="SafeAreaContainer/ScrollContainer/VBoxContainer/DataCard/VBox"]
+custom_minimum_size = Vector2(0, 60)
 layout_mode = 2
 theme_override_font_sizes/font_size = 32
-text = "Press a button to test"
-horizontal_alignment = 1
+theme_override_styles/normal = SubResource("StyleBoxFlat_button")
+text = "Get Today's Steps"
 
-[connection signal="pressed" from="SafeAreaContainer/VBoxContainer/TodaySteps" to="." method="_on_today_steps_pressed"]
-[connection signal="pressed" from="SafeAreaContainer/VBoxContainer/TotalSteps" to="." method="_on_total_steps_pressed"]
-[connection signal="pressed" from="SafeAreaContainer/VBoxContainer/PeriodSteps" to="." method="_on_period_steps_pressed"]
-[connection signal="pressed" from="SafeAreaContainer/VBoxContainer/RequestPermission" to="." method="_on_request_permission_pressed"]
-[connection signal="pressed" from="SafeAreaContainer/VBoxContainer/StartObserver" to="." method="_on_start_observer_pressed"]
-[connection signal="pressed" from="SafeAreaContainer/VBoxContainer/CheckStatus" to="." method="_on_check_status_pressed"]
+[node name="TotalSteps" type="Button" parent="SafeAreaContainer/ScrollContainer/VBoxContainer/DataCard/VBox"]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+theme_override_styles/normal = SubResource("StyleBoxFlat_button")
+text = "Get Total Steps"
+
+[node name="PeriodSteps" type="Button" parent="SafeAreaContainer/ScrollContainer/VBoxContainer/DataCard/VBox"]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+theme_override_styles/normal = SubResource("StyleBoxFlat_button")
+text = "Get 7-Day History"
+
+[node name="PermissionCard" type="PanelContainer" parent="SafeAreaContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_card")
+
+[node name="VBox" type="VBoxContainer" parent="SafeAreaContainer/ScrollContainer/VBoxContainer/PermissionCard"]
+layout_mode = 2
+theme_override_constants/separation = 15
+
+[node name="Label" type="Label" parent="SafeAreaContainer/ScrollContainer/VBoxContainer/PermissionCard/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.235294, 0.235294, 0.262745, 1)
+theme_override_font_sizes/font_size = 28
+text = "PERMISSIONS & STATUS"
+
+[node name="RequestPermission" type="Button" parent="SafeAreaContainer/ScrollContainer/VBoxContainer/PermissionCard/VBox"]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+theme_override_styles/normal = SubResource("StyleBoxFlat_button")
+text = "Request iOS Permissions"
+
+[node name="StartObserver" type="Button" parent="SafeAreaContainer/ScrollContainer/VBoxContainer/PermissionCard/VBox"]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+theme_override_styles/normal = SubResource("StyleBoxFlat_button")
+text = "Start Live Steps"
+
+[node name="CheckStatus" type="Button" parent="SafeAreaContainer/ScrollContainer/VBoxContainer/PermissionCard/VBox"]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+theme_override_styles/normal = SubResource("StyleBoxFlat_button_grey")
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "Check Permission Status"
+
+[node name="ManagePermissions" type="Button" parent="SafeAreaContainer/ScrollContainer/VBoxContainer/PermissionCard/VBox"]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+theme_override_styles/normal = SubResource("StyleBoxFlat_button_grey")
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "Open iOS Settings"
+
+[node name="ResultLabel" type="Label" parent="SafeAreaContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 36
+text = "Tap a button to begin"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[connection signal="pressed" from="SafeAreaContainer/ScrollContainer/VBoxContainer/DataCard/VBox/TodaySteps" to="." method="_on_today_steps_pressed"]
+[connection signal="pressed" from="SafeAreaContainer/ScrollContainer/VBoxContainer/DataCard/VBox/TotalSteps" to="." method="_on_total_steps_pressed"]
+[connection signal="pressed" from="SafeAreaContainer/ScrollContainer/VBoxContainer/DataCard/VBox/PeriodSteps" to="." method="_on_period_steps_pressed"]
+[connection signal="pressed" from="SafeAreaContainer/ScrollContainer/VBoxContainer/PermissionCard/VBox/RequestPermission" to="." method="_on_request_permission_pressed"]
+[connection signal="pressed" from="SafeAreaContainer/ScrollContainer/VBoxContainer/PermissionCard/VBox/StartObserver" to="." method="_on_start_observer_pressed"]
+[connection signal="pressed" from="SafeAreaContainer/ScrollContainer/VBoxContainer/PermissionCard/VBox/CheckStatus" to="." method="_on_check_status_pressed"]
+[connection signal="pressed" from="SafeAreaContainer/ScrollContainer/VBoxContainer/PermissionCard/VBox/ManagePermissions" to="." method="_on_manage_permissions_pressed"]
