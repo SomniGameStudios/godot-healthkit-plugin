@@ -13,18 +13,18 @@ var _is_ios: bool = false
 
 enum AuthorizationStatus {
 	NOT_DETERMINED = 0,
-	DENIED = 1,
-	AUTHORIZED = 2
+	SHARING_DENIED = 1,
+	SHARING_AUTHORIZED = 2
 }
 
 func get_permission_status_string(status: int) -> String:
 	match status:
 		AuthorizationStatus.NOT_DETERMINED:
 			return "Not Determined"
-		AuthorizationStatus.DENIED:
-			return "Denied (Check System Settings)"
-		AuthorizationStatus.AUTHORIZED:
-			return "Authorized"
+		AuthorizationStatus.SHARING_DENIED:
+			return "Sharing Denied (Read Status Hidden)"
+		AuthorizationStatus.SHARING_AUTHORIZED:
+			return "Sharing Authorized"
 		_:
 			return "Unknown (%d)" % status
 

@@ -48,19 +48,21 @@ func _on_start_observer_pressed() -> void:
 	result_label.text = "Observer started. Walk to see live updates!"
 
 func _on_check_status_pressed() -> void:
-	var available = HealthKit.is_health_data_available()
+	var available := HealthKit.is_health_data_available()
 	var status = HealthKit.get_permission_status()
-	var status_str = HealthKit.get_permission_status_string(status)
+	result_label.add_theme_color_override("font_color", Color.BLACK)
 	
-	result_label.text = "Available: %s\nStatus: %s" % [str(available).to_upper(), status_str]
+	if status == HealthKit.AuthorizationStatus.NOT_DETERMINED:
+		result_label.text = "HealthKit Available: %s\nStatus: Not Requested / Determined" % str(available).to_upper()
+		return
+		
+	result_label.text = "HealthKit Available: %s\nVerifying read access..." % str(available).to_upper()
 	
-	match status:
-		HealthKit.AuthorizationStatus.AUTHORIZED:
-			result_label.add_theme_color_override("font_color", Color.SEA_GREEN)
-		HealthKit.AuthorizationStatus.DENIED:
-			result_label.add_theme_color_override("font_color", Color.FIREBRICK)
-		_:
-			result_label.add_theme_color_override("font_color", Color.BLACK)
+	HealthKit.run_today_steps_query()
+	var steps: int = await HealthKit.today_steps_ready
+	
+	result_label.text = "HealthKit Available: %s\nRead Access: Granted\nToday's Steps: %d" % [str(available).to_upper(), steps]
+	result_label.add_theme_color_override("font_color", Color.SEA_GREEN)
 
 func _on_manage_permissions_pressed() -> void:
 	HealthKit.open_settings()

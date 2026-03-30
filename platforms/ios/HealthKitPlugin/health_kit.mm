@@ -233,14 +233,17 @@ bool HealthKit::is_health_data_available() {
 }
 
 void HealthKit::open_settings() {
-    NSURL *healthUrl = [NSURL URLWithString:@"x-apple-health://"];
-    if ([[UIApplication sharedApplication] canOpenURL:healthUrl]) {
-        [[UIApplication sharedApplication] openURL:healthUrl options:@{} completionHandler:nil];
-    } else {
-        NSURL *settingsUrl = [NSURL URLWithString:UIApplicationOpenSettingsURLString];
-        if ([[UIApplication sharedApplication] canOpenURL:settingsUrl]) {
-            [[UIApplication sharedApplication] openURL:settingsUrl options:@{} completionHandler:nil];
-        }
+    // Primary: Try to open the Apple Health app directly
+    NSURL *healthAppUrl = [NSURL URLWithString:@"x-apple-health://"];
+    if ([[UIApplication sharedApplication] canOpenURL:healthAppUrl]) {
+        [[UIApplication sharedApplication] openURL:healthAppUrl options:@{} completionHandler:nil];
+        return;
+    } 
+    
+    // Fallback: Open the App's own specific Settings page
+    NSURL *appSettingsUrl = [NSURL URLWithString:UIApplicationOpenSettingsURLString];
+    if ([[UIApplication sharedApplication] canOpenURL:appSettingsUrl]) {
+        [[UIApplication sharedApplication] openURL:appSettingsUrl options:@{} completionHandler:nil];
     }
 }
 
