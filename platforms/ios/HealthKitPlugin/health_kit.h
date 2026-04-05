@@ -30,6 +30,11 @@ public:
     void start_step_observer();
     void stop_step_observer();
 
+    bool is_pedometer_available();
+    void start_pedometer_observer();
+    void stop_pedometer_observer();
+    int get_live_pedometer_steps();
+
     static HealthKit *get_singleton();
 
     HealthKit();
@@ -38,9 +43,11 @@ public:
 private:
     int today_steps = 0;
     int total_steps = 0;
+    int live_pedometer_steps = 0;
     std::map<String, int> period_steps;
     void* health_store = nullptr;
     void* observer_query = nullptr;
+    void* pedometer = nullptr;
     std::mutex data_mutex;
 };
 

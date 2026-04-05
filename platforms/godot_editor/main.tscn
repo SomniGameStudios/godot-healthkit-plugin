@@ -148,7 +148,14 @@ custom_minimum_size = Vector2(0, 60)
 layout_mode = 2
 theme_override_font_sizes/font_size = 30
 theme_override_styles/normal = SubResource("StyleBoxFlat_button")
-text = "Start Live Steps"
+text = "Start HK Observer"
+
+[node name="StartPedometer" type="Button" parent="SafeAreaContainer/ScrollContainer/VBoxContainer/PermissionCard/VBox"]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+theme_override_styles/normal = SubResource("StyleBoxFlat_button")
+text = "Start Live Pedometer"
 
 [node name="CheckStatus" type="Button" parent="SafeAreaContainer/ScrollContainer/VBoxContainer/PermissionCard/VBox"]
 custom_minimum_size = Vector2(0, 60)
@@ -179,5 +186,6 @@ autowrap_mode = 3
 [connection signal="pressed" from="SafeAreaContainer/ScrollContainer/VBoxContainer/DataCard/VBox/PeriodSteps" to="." method="_on_period_steps_pressed"]
 [connection signal="pressed" from="SafeAreaContainer/ScrollContainer/VBoxContainer/PermissionCard/VBox/RequestPermission" to="." method="_on_request_permission_pressed"]
 [connection signal="pressed" from="SafeAreaContainer/ScrollContainer/VBoxContainer/PermissionCard/VBox/StartObserver" to="." method="_on_start_observer_pressed"]
+[connection signal="pressed" from="SafeAreaContainer/ScrollContainer/VBoxContainer/PermissionCard/VBox/StartPedometer" to="." method="_on_start_pedometer_pressed"]
 [connection signal="pressed" from="SafeAreaContainer/ScrollContainer/VBoxContainer/PermissionCard/VBox/CheckStatus" to="." method="_on_check_status_pressed"]
 [connection signal="pressed" from="SafeAreaContainer/ScrollContainer/VBoxContainer/PermissionCard/VBox/ManagePermissions" to="." method="_on_manage_permissions_pressed"]

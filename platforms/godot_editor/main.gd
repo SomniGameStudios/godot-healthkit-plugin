@@ -5,6 +5,7 @@ extends Control
 func _ready() -> void:
 	HealthKit.permission_result.connect(_on_permission_result)
 	HealthKit.steps_updated.connect(_on_steps_updated)
+	HealthKit.pedometer_steps_updated.connect(_on_pedometer_steps_updated)
 	# Set default color for light theme
 	result_label.add_theme_color_override("font_color", Color.BLACK)
 
@@ -17,7 +18,10 @@ func _on_permission_result(granted: bool) -> void:
 	result_label.text = "Permission granted: " + str(granted)
 
 func _on_steps_updated(steps: int) -> void:
-	result_label.text = "Live steps update: %d" % steps
+	result_label.text = "Observer steps update: %d" % steps
+
+func _on_pedometer_steps_updated(steps: int) -> void:
+	result_label.text = "Pedometer steps update: %d" % steps
 
 func _on_today_steps_pressed() -> void:
 	HealthKit.run_today_steps_query()
@@ -45,7 +49,14 @@ func _on_request_permission_pressed() -> void:
 
 func _on_start_observer_pressed() -> void:
 	HealthKit.start_step_observer()
-	result_label.text = "Observer started. Walk to see live updates!"
+	result_label.text = "Observer started. (Slow updates)"
+
+func _on_start_pedometer_pressed() -> void:
+	if not HealthKit.is_pedometer_available():
+		result_label.text = "Pedometer not available on this device"
+		return
+	HealthKit.start_pedometer_observer()
+	result_label.text = "Pedometer started. Walk to see real-time updates!"
 
 func _on_check_status_pressed() -> void:
 	var available := HealthKit.is_health_data_available()

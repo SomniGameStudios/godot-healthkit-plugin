@@ -4,6 +4,7 @@ extends Node
 
 signal permission_result(granted: bool)
 signal steps_updated(steps: int)
+signal pedometer_steps_updated(steps: int)
 signal today_steps_ready(steps: int)
 signal total_steps_ready(steps: int)
 signal period_steps_ready(steps_dict: Dictionary)
@@ -36,6 +37,7 @@ func _ready() -> void:
 			_healthkit_plugin = Engine.get_singleton("GodotHealthKit")
 			_healthkit_plugin.connect("permission_result", Callable(self, "_on_permission_result"))
 			_healthkit_plugin.connect("steps_updated", Callable(self, "_on_steps_updated"))
+			_healthkit_plugin.connect("pedometer_steps_updated", Callable(self, "_on_pedometer_steps_updated"))
 			_healthkit_plugin.connect("today_steps_ready", Callable(self, "_on_today_steps_ready"))
 			_healthkit_plugin.connect("total_steps_ready", Callable(self, "_on_total_steps_ready"))
 			_healthkit_plugin.connect("period_steps_ready", Callable(self, "_on_period_steps_ready"))
@@ -50,6 +52,9 @@ func _on_permission_result(granted: bool) -> void:
 
 func _on_steps_updated(steps: int) -> void:
 	steps_updated.emit(steps)
+
+func _on_pedometer_steps_updated(steps: int) -> void:
+	pedometer_steps_updated.emit(steps)
 
 func _on_today_steps_ready(steps: int) -> void:
 	today_steps_ready.emit(steps)
@@ -85,6 +90,24 @@ func start_step_observer() -> void:
 func stop_step_observer() -> void:
 	if _healthkit_plugin:
 		_healthkit_plugin.stop_step_observer()
+
+func is_pedometer_available() -> bool:
+	if _healthkit_plugin:
+		return _healthkit_plugin.is_pedometer_available()
+	return true
+
+func start_pedometer_observer() -> void:
+	if _healthkit_plugin:
+		_healthkit_plugin.start_pedometer_observer()
+
+func stop_pedometer_observer() -> void:
+	if _healthkit_plugin:
+		_healthkit_plugin.stop_pedometer_observer()
+
+func get_live_pedometer_steps() -> int:
+	if _healthkit_plugin:
+		return _healthkit_plugin.get_live_pedometer_steps()
+	return 0
 
 func run_today_steps_query() -> void:
 	if _healthkit_plugin:

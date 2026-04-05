@@ -2,6 +2,7 @@
 #include <Foundation/NSDate.h>
 #include <HealthKit/HealthKit.h>
 #import <UIKit/UIKit.h>
+#import <CoreMotion/CoreMotion.h>
 
 HealthKit *HealthKit::instance = NULL;
 
@@ -20,8 +21,14 @@ void HealthKit::_bind_methods() {
     ClassDB::bind_method(D_METHOD("start_step_observer"), &HealthKit::start_step_observer);
     ClassDB::bind_method(D_METHOD("stop_step_observer"), &HealthKit::stop_step_observer);
 
+    ClassDB::bind_method(D_METHOD("is_pedometer_available"), &HealthKit::is_pedometer_available);
+    ClassDB::bind_method(D_METHOD("start_pedometer_observer"), &HealthKit::start_pedometer_observer);
+    ClassDB::bind_method(D_METHOD("stop_pedometer_observer"), &HealthKit::stop_pedometer_observer);
+    ClassDB::bind_method(D_METHOD("get_live_pedometer_steps"), &HealthKit::get_live_pedometer_steps);
+
     ADD_SIGNAL(MethodInfo("permission_result", PropertyInfo(Variant::BOOL, "granted")));
     ADD_SIGNAL(MethodInfo("steps_updated", PropertyInfo(Variant::INT, "steps")));
+    ADD_SIGNAL(MethodInfo("pedometer_steps_updated", PropertyInfo(Variant::INT, "steps")));
 
     ADD_SIGNAL(MethodInfo("today_steps_ready", PropertyInfo(Variant::INT, "steps")));
     ADD_SIGNAL(MethodInfo("total_steps_ready", PropertyInfo(Variant::INT, "steps")));
@@ -45,6 +52,11 @@ HealthKit::HealthKit() {
     
     HKHealthStore* store = [[HKHealthStore alloc] init];
     health_store = (void*)CFBridgingRetain(store);
+    
+    if ([CMPedometer isStepCountingAvailable]) {
+        CMPedometer* ped = [[CMPedometer alloc] init];
+        pedometer = (void*)CFBridgingRetain(ped);
+    }
 }
 
 int HealthKit::get_today_steps() {
@@ -77,7 +89,13 @@ void HealthKit::run_today_steps_walked_query() {
                                 completionHandler:^(HKStatisticsQuery * _Nonnull query, HKStatistics * _Nullable result, NSError * _Nullable error) {
         
         if (error != nil) {
-            NSLog(@"Error with today's steps: %@. Defaulting to 0.", error);
+            NSLog(@"Error with today's steps: %@.", error);
+            // Heuristic: If we get error code 11 (No data available), it often means read permission was denied 
+            // but Apple is hiding it. We treat this as a negative permission result.
+            if (error.code == 11) {
+                instance->call_deferred("emit_signal", "permission_result", false);
+            }
+            
             {
                 std::lock_guard<std::mutex> lock(instance->data_mutex);
                 instance->today_steps = 0;
@@ -320,10 +338,56 @@ void HealthKit::stop_step_observer() {
     observer_query = nullptr;
 }
 
+bool HealthKit::is_pedometer_available() {
+    return [CMPedometer isStepCountingAvailable];
+}
+
+void HealthKit::start_pedometer_observer() {
+    if (!pedometer) return;
+    CMPedometer* ped = (__bridge CMPedometer*)pedometer;
+    
+    NSDate *now = [NSDate date];
+    // We start counting from right now
+    [ped startPedometerUpdatesFromDate:now withHandler:^(CMPedometerData * _Nullable pedometerData, NSError * _Nullable error) {
+        if (error) {
+            NSLog(@"Pedometer error: %@", error);
+            return;
+        }
+        
+        if (pedometerData) {
+            int current_steps = pedometerData.numberOfSteps.intValue;
+            {
+                std::lock_guard<std::mutex> lock(instance->data_mutex);
+                instance->live_pedometer_steps = current_steps;
+            }
+            instance->call_deferred("emit_signal", "pedometer_steps_updated", current_steps);
+        }
+    }];
+    NSLog(@"CMPedometer updates started.");
+}
+
+void HealthKit::stop_pedometer_observer() {
+    if (!pedometer) return;
+    CMPedometer* ped = (__bridge CMPedometer*)pedometer;
+    [ped stopPedometerUpdates];
+    NSLog(@"CMPedometer updates stopped.");
+}
+
+int HealthKit::get_live_pedometer_steps() {
+    std::lock_guard<std::mutex> lock(data_mutex);
+    return live_pedometer_steps;
+}
+
 HealthKit::~HealthKit() {
     if (observer_query) {
         CFBridgingRelease(observer_query);
         observer_query = nullptr;
+    }
+    if (pedometer) {
+        CMPedometer* ped = (__bridge CMPedometer*)pedometer;
+        [ped stopPedometerUpdates];
+        CFBridgingRelease(pedometer);
+        pedometer = nullptr;
     }
     if (health_store) {
         CFBridgingRelease(health_store);
