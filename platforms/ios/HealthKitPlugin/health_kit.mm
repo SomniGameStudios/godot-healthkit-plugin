@@ -22,6 +22,7 @@ void HealthKit::_bind_methods() {
     ClassDB::bind_method(D_METHOD("stop_step_observer"), &HealthKit::stop_step_observer);
 
     ClassDB::bind_method(D_METHOD("is_pedometer_available"), &HealthKit::is_pedometer_available);
+    ClassDB::bind_method(D_METHOD("get_pedometer_permission_status"), &HealthKit::get_pedometer_permission_status);
     ClassDB::bind_method(D_METHOD("start_pedometer_observer"), &HealthKit::start_pedometer_observer);
     ClassDB::bind_method(D_METHOD("stop_pedometer_observer"), &HealthKit::stop_pedometer_observer);
     ClassDB::bind_method(D_METHOD("get_live_pedometer_steps"), &HealthKit::get_live_pedometer_steps);
@@ -29,6 +30,7 @@ void HealthKit::_bind_methods() {
     ADD_SIGNAL(MethodInfo("permission_result", PropertyInfo(Variant::BOOL, "granted")));
     ADD_SIGNAL(MethodInfo("steps_updated", PropertyInfo(Variant::INT, "steps")));
     ADD_SIGNAL(MethodInfo("pedometer_steps_updated", PropertyInfo(Variant::INT, "steps")));
+    ADD_SIGNAL(MethodInfo("pedometer_error", PropertyInfo(Variant::STRING, "reason")));
 
     ADD_SIGNAL(MethodInfo("today_steps_ready", PropertyInfo(Variant::INT, "steps")));
     ADD_SIGNAL(MethodInfo("total_steps_ready", PropertyInfo(Variant::INT, "steps")));
@@ -53,10 +55,8 @@ HealthKit::HealthKit() {
     HKHealthStore* store = [[HKHealthStore alloc] init];
     health_store = (void*)CFBridgingRetain(store);
     
-    if ([CMPedometer isStepCountingAvailable]) {
-        CMPedometer* ped = [[CMPedometer alloc] init];
-        pedometer = (void*)CFBridgingRetain(ped);
-    }
+    CMPedometer* ped = [[CMPedometer alloc] init];
+    pedometer = (void*)CFBridgingRetain(ped);
 }
 
 int HealthKit::get_today_steps() {
@@ -342,6 +342,11 @@ bool HealthKit::is_pedometer_available() {
     return [CMPedometer isStepCountingAvailable];
 }
 
+int HealthKit::get_pedometer_permission_status() {
+    // CMAuthorizationStatus: 0=notDetermined, 1=restricted, 2=denied, 3=authorized
+    return (int)[CMPedometer authorizationStatus];
+}
+
 void HealthKit::start_pedometer_observer() {
     if (!pedometer) return;
     CMPedometer* ped = (__bridge CMPedometer*)pedometer;
@@ -351,6 +356,7 @@ void HealthKit::start_pedometer_observer() {
     [ped startPedometerUpdatesFromDate:now withHandler:^(CMPedometerData * _Nullable pedometerData, NSError * _Nullable error) {
         if (error) {
             NSLog(@"Pedometer error: %@", error);
+            instance->call_deferred("emit_signal", "pedometer_error", String(error.localizedDescription.UTF8String));
             return;
         }
         

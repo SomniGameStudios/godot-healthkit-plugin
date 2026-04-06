@@ -5,6 +5,7 @@ extends Node
 signal permission_result(granted: bool)
 signal steps_updated(steps: int)
 signal pedometer_steps_updated(steps: int)
+signal pedometer_error(reason: String)
 signal today_steps_ready(steps: int)
 signal total_steps_ready(steps: int)
 signal period_steps_ready(steps_dict: Dictionary)
@@ -16,6 +17,14 @@ enum AuthorizationStatus {
 	NOT_DETERMINED = 0,
 	SHARING_DENIED = 1,
 	SHARING_AUTHORIZED = 2
+}
+
+## CMAuthorizationStatus — Apple's CoreMotion permission states
+enum MotionAuthorizationStatus {
+	NOT_DETERMINED = 0,
+	RESTRICTED = 1,
+	DENIED = 2,
+	AUTHORIZED = 3
 }
 
 func get_permission_status_string(status: int) -> String:
@@ -38,6 +47,7 @@ func _ready() -> void:
 			_healthkit_plugin.connect("permission_result", Callable(self, "_on_permission_result"))
 			_healthkit_plugin.connect("steps_updated", Callable(self, "_on_steps_updated"))
 			_healthkit_plugin.connect("pedometer_steps_updated", Callable(self, "_on_pedometer_steps_updated"))
+			_healthkit_plugin.connect("pedometer_error", Callable(self, "_on_pedometer_error"))
 			_healthkit_plugin.connect("today_steps_ready", Callable(self, "_on_today_steps_ready"))
 			_healthkit_plugin.connect("total_steps_ready", Callable(self, "_on_total_steps_ready"))
 			_healthkit_plugin.connect("period_steps_ready", Callable(self, "_on_period_steps_ready"))
@@ -55,6 +65,9 @@ func _on_steps_updated(steps: int) -> void:
 
 func _on_pedometer_steps_updated(steps: int) -> void:
 	pedometer_steps_updated.emit(steps)
+
+func _on_pedometer_error(reason: String) -> void:
+	pedometer_error.emit(reason)
 
 func _on_today_steps_ready(steps: int) -> void:
 	today_steps_ready.emit(steps)
@@ -94,7 +107,12 @@ func stop_step_observer() -> void:
 func is_pedometer_available() -> bool:
 	if _healthkit_plugin:
 		return _healthkit_plugin.is_pedometer_available()
-	return true
+	return false
+
+func get_pedometer_permission_status() -> int:
+	if _healthkit_plugin:
+		return _healthkit_plugin.get_pedometer_permission_status()
+	return MotionAuthorizationStatus.AUTHORIZED
 
 func start_pedometer_observer() -> void:
 	if _healthkit_plugin:

@@ -31,6 +31,7 @@ public:
     void stop_step_observer();
 
     bool is_pedometer_available();
+    int get_pedometer_permission_status();
     void start_pedometer_observer();
     void stop_pedometer_observer();
     int get_live_pedometer_steps();
