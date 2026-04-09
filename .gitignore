@@ -27,3 +27,4 @@ platforms/godot_editor/ios/plugins/*
 .DS_Store
 *~
 .claude/settings.local.json
+/export-ios

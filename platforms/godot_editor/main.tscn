@@ -1,9 +1,67 @@
-[gd_scene format=3 uid="uid://cii7r0tlrlqoo"]
+[gd_scene load_steps=7 format=3 uid="uid://cii7r0tlrlqoo"]
 
 [ext_resource type="Script" uid="uid://dc5kywrohbr0v" path="res://main.gd" id="1_main"]
 [ext_resource type="Script" uid="uid://dbg2y32gc1ybd" path="res://scenes/safe_area_container.gd" id="2_safe_area"]
 
-[node name="Main" type="Control" unique_id=557561218]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_card"]
+content_margin_left = 20.0
+content_margin_top = 20.0
+content_margin_right = 20.0
+content_margin_bottom = 20.0
+bg_color = Color(1, 1, 1, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+shadow_color = Color(0, 0, 0, 0.05)
+shadow_size = 10
+shadow_offset = Vector2(0, 4)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button_blue"]
+content_margin_left = 12.0
+content_margin_top = 12.0
+content_margin_right = 12.0
+content_margin_bottom = 12.0
+bg_color = Color(0, 0.478431, 1, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button_green"]
+content_margin_left = 12.0
+content_margin_top = 12.0
+content_margin_right = 12.0
+content_margin_bottom = 12.0
+bg_color = Color(0.2, 0.7, 0.3, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button_grey"]
+content_margin_left = 12.0
+content_margin_top = 12.0
+content_margin_right = 12.0
+content_margin_bottom = 12.0
+bg_color = Color(0.898039, 0.898039, 0.917647, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button_red"]
+content_margin_left = 12.0
+content_margin_top = 12.0
+content_margin_right = 12.0
+content_margin_bottom = 12.0
+bg_color = Color(0.9, 0.25, 0.25, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[node name="Main" type="Control"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -12,74 +70,169 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_main")
 
-[node name="SafeAreaContainer" type="MarginContainer" parent="." unique_id=24036684]
+[node name="Background" type="ColorRect" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/margin_left = 60
-theme_override_constants/margin_right = 60
-theme_override_constants/margin_bottom = 30
+color = Color(0.94902, 0.94902, 0.968627, 1)
+
+[node name="SafeAreaContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
 script = ExtResource("2_safe_area")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="SafeAreaContainer" unique_id=1589212888]
+[node name="ScrollContainer" type="ScrollContainer" parent="SafeAreaContainer"]
 layout_mode = 2
-theme_override_constants/separation = 40
-alignment = 1
+horizontal_scroll_mode = 0
 
-[node name="Title" type="Label" parent="SafeAreaContainer/VBoxContainer" unique_id=705612306]
+[node name="VBoxContainer" type="VBoxContainer" parent="SafeAreaContainer/ScrollContainer"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 42
+size_flags_horizontal = 3
+theme_override_constants/separation = 20
+alignment = 0
+
+[node name="Title" type="Label" parent="SafeAreaContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 40
 text = "HealthKit Plugin Demo"
 horizontal_alignment = 1
 
-[node name="TodaySteps" type="Button" parent="SafeAreaContainer/VBoxContainer" unique_id=1715006200]
-custom_minimum_size = Vector2(0, 80)
+[node name="HealthKitCard" type="PanelContainer" parent="SafeAreaContainer/ScrollContainer/VBoxContainer"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 36
-text = "Get Today's Steps"
+theme_override_styles/panel = SubResource("StyleBoxFlat_card")
 
-[node name="TotalSteps" type="Button" parent="SafeAreaContainer/VBoxContainer" unique_id=1044139786]
-custom_minimum_size = Vector2(0, 80)
+[node name="VBox" type="VBoxContainer" parent="SafeAreaContainer/ScrollContainer/VBoxContainer/HealthKitCard"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 36
-text = "Get Total Steps"
+theme_override_constants/separation = 10
 
-[node name="PeriodSteps" type="Button" parent="SafeAreaContainer/VBoxContainer" unique_id=1582353958]
-custom_minimum_size = Vector2(0, 80)
+[node name="Label" type="Label" parent="SafeAreaContainer/ScrollContainer/VBoxContainer/HealthKitCard/VBox"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 36
-text = "Get Period Steps (7 days)"
+theme_override_colors/font_color = Color(0.235294, 0.235294, 0.262745, 1)
+theme_override_font_sizes/font_size = 26
+text = "HEALTHKIT"
 
-[node name="RequestPermission" type="Button" parent="SafeAreaContainer/VBoxContainer"]
-custom_minimum_size = Vector2(0, 80)
+[node name="HKRequestPermission" type="Button" parent="SafeAreaContainer/ScrollContainer/VBoxContainer/HealthKitCard/VBox"]
+custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
-theme_override_font_sizes/font_size = 36
+theme_override_font_sizes/font_size = 26
+theme_override_styles/normal = SubResource("StyleBoxFlat_button_blue")
 text = "Request Permission"
 
-[node name="StartObserver" type="Button" parent="SafeAreaContainer/VBoxContainer"]
-custom_minimum_size = Vector2(0, 80)
+[node name="HKCheckStatus" type="Button" parent="SafeAreaContainer/ScrollContainer/VBoxContainer/HealthKitCard/VBox"]
+custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
-theme_override_font_sizes/font_size = 36
+theme_override_font_sizes/font_size = 26
+theme_override_styles/normal = SubResource("StyleBoxFlat_button_grey")
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "Check Status"
+
+[node name="HKTodaySteps" type="Button" parent="SafeAreaContainer/ScrollContainer/VBoxContainer/HealthKitCard/VBox"]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+theme_override_styles/normal = SubResource("StyleBoxFlat_button_blue")
+text = "Get Today's Steps"
+
+[node name="HKTotalSteps" type="Button" parent="SafeAreaContainer/ScrollContainer/VBoxContainer/HealthKitCard/VBox"]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+theme_override_styles/normal = SubResource("StyleBoxFlat_button_blue")
+text = "Get Total Steps"
+
+[node name="HKPeriodSteps" type="Button" parent="SafeAreaContainer/ScrollContainer/VBoxContainer/HealthKitCard/VBox"]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+theme_override_styles/normal = SubResource("StyleBoxFlat_button_blue")
+text = "Get 7-Day History"
+
+[node name="HKStartObserver" type="Button" parent="SafeAreaContainer/ScrollContainer/VBoxContainer/HealthKitCard/VBox"]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+theme_override_styles/normal = SubResource("StyleBoxFlat_button_green")
 text = "Start Observer"
 
-[node name="CheckStatus" type="Button" parent="SafeAreaContainer/VBoxContainer"]
-custom_minimum_size = Vector2(0, 80)
+[node name="HKStopObserver" type="Button" parent="SafeAreaContainer/ScrollContainer/VBoxContainer/HealthKitCard/VBox"]
+custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
-theme_override_font_sizes/font_size = 36
-text = "Check Permission Status"
+theme_override_font_sizes/font_size = 26
+theme_override_styles/normal = SubResource("StyleBoxFlat_button_red")
+text = "Stop Observer"
 
-[node name="ResultLabel" type="Label" parent="SafeAreaContainer/VBoxContainer" unique_id=1082152538]
+[node name="HKOpenSettings" type="Button" parent="SafeAreaContainer/ScrollContainer/VBoxContainer/HealthKitCard/VBox"]
+custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
-theme_override_font_sizes/font_size = 32
-text = "Press a button to test"
+theme_override_font_sizes/font_size = 26
+theme_override_styles/normal = SubResource("StyleBoxFlat_button_grey")
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "Open Health Settings"
+
+[node name="PedometerCard" type="PanelContainer" parent="SafeAreaContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_card")
+
+[node name="VBox" type="VBoxContainer" parent="SafeAreaContainer/ScrollContainer/VBoxContainer/PedometerCard"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Label" type="Label" parent="SafeAreaContainer/ScrollContainer/VBoxContainer/PedometerCard/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.235294, 0.235294, 0.262745, 1)
+theme_override_font_sizes/font_size = 26
+text = "COREMOTION PEDOMETER"
+
+[node name="CMCheckStatus" type="Button" parent="SafeAreaContainer/ScrollContainer/VBoxContainer/PedometerCard/VBox"]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+theme_override_styles/normal = SubResource("StyleBoxFlat_button_grey")
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "Check Pedometer Status"
+
+[node name="CMStartPedometer" type="Button" parent="SafeAreaContainer/ScrollContainer/VBoxContainer/PedometerCard/VBox"]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+theme_override_styles/normal = SubResource("StyleBoxFlat_button_green")
+text = "Start Pedometer"
+
+[node name="CMStopPedometer" type="Button" parent="SafeAreaContainer/ScrollContainer/VBoxContainer/PedometerCard/VBox"]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+theme_override_styles/normal = SubResource("StyleBoxFlat_button_red")
+text = "Stop Pedometer"
+
+[node name="ResultLabel" type="Label" parent="SafeAreaContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 28
+text = "Tap a button to begin"
 horizontal_alignment = 1
+autowrap_mode = 3
 
-[connection signal="pressed" from="SafeAreaContainer/VBoxContainer/TodaySteps" to="." method="_on_today_steps_pressed"]
-[connection signal="pressed" from="SafeAreaContainer/VBoxContainer/TotalSteps" to="." method="_on_total_steps_pressed"]
-[connection signal="pressed" from="SafeAreaContainer/VBoxContainer/PeriodSteps" to="." method="_on_period_steps_pressed"]
-[connection signal="pressed" from="SafeAreaContainer/VBoxContainer/RequestPermission" to="." method="_on_request_permission_pressed"]
-[connection signal="pressed" from="SafeAreaContainer/VBoxContainer/StartObserver" to="." method="_on_start_observer_pressed"]
-[connection signal="pressed" from="SafeAreaContainer/VBoxContainer/CheckStatus" to="." method="_on_check_status_pressed"]
+[connection signal="pressed" from="SafeAreaContainer/ScrollContainer/VBoxContainer/HealthKitCard/VBox/HKRequestPermission" to="." method="_on_hk_request_permission"]
+[connection signal="pressed" from="SafeAreaContainer/ScrollContainer/VBoxContainer/HealthKitCard/VBox/HKCheckStatus" to="." method="_on_hk_check_status"]
+[connection signal="pressed" from="SafeAreaContainer/ScrollContainer/VBoxContainer/HealthKitCard/VBox/HKTodaySteps" to="." method="_on_hk_today_steps"]
+[connection signal="pressed" from="SafeAreaContainer/ScrollContainer/VBoxContainer/HealthKitCard/VBox/HKTotalSteps" to="." method="_on_hk_total_steps"]
+[connection signal="pressed" from="SafeAreaContainer/ScrollContainer/VBoxContainer/HealthKitCard/VBox/HKPeriodSteps" to="." method="_on_hk_period_steps"]
+[connection signal="pressed" from="SafeAreaContainer/ScrollContainer/VBoxContainer/HealthKitCard/VBox/HKStartObserver" to="." method="_on_hk_start_observer"]
+[connection signal="pressed" from="SafeAreaContainer/ScrollContainer/VBoxContainer/HealthKitCard/VBox/HKStopObserver" to="." method="_on_hk_stop_observer"]
+[connection signal="pressed" from="SafeAreaContainer/ScrollContainer/VBoxContainer/HealthKitCard/VBox/HKOpenSettings" to="." method="_on_hk_open_settings"]
+[connection signal="pressed" from="SafeAreaContainer/ScrollContainer/VBoxContainer/PedometerCard/VBox/CMCheckStatus" to="." method="_on_cm_check_status"]
+[connection signal="pressed" from="SafeAreaContainer/ScrollContainer/VBoxContainer/PedometerCard/VBox/CMStartPedometer" to="." method="_on_cm_start_pedometer"]
+[connection signal="pressed" from="SafeAreaContainer/ScrollContainer/VBoxContainer/PedometerCard/VBox/CMStopPedometer" to="." method="_on_cm_stop_pedometer"]

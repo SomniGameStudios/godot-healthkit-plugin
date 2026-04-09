@@ -4,6 +4,7 @@
 #include "core/version.h"
 #include "core/object/class_db.h"
 #include <map>
+#include <mutex>
 
 class HealthKit : public Object {
 
@@ -24,9 +25,16 @@ public:
     void request_permission();
     int get_permission_status();
     bool is_health_data_available();
+    void open_settings();
     
     void start_step_observer();
     void stop_step_observer();
+
+    bool is_pedometer_available();
+    int get_pedometer_permission_status();
+    void start_pedometer_observer();
+    void stop_pedometer_observer();
+    int get_live_pedometer_steps();
 
     static HealthKit *get_singleton();
 
@@ -36,9 +44,12 @@ public:
 private:
     int today_steps = 0;
     int total_steps = 0;
+    int live_pedometer_steps = 0;
     std::map<String, int> period_steps;
     void* health_store = nullptr;
     void* observer_query = nullptr;
+    void* pedometer = nullptr;
+    std::mutex data_mutex;
 };
 
 #endif
