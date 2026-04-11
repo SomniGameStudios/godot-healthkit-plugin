@@ -17,8 +17,8 @@ platforms/ios/godot/
 *.os
 
 # Demo plugin binaries (populated by build)
-platforms/godot_editor/ios/plugins/*
-!platforms/godot_editor/ios/plugins/.gitkeep
+platforms/godot_editor/addons/healthkit_plugin/HealthKitPlugin.gdip
+platforms/godot_editor/addons/healthkit_plugin/HealthKitPlugin/
 
 # Godot editor
 .godot/

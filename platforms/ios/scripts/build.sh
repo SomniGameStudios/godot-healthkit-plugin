@@ -113,11 +113,11 @@ cp "$PLUGIN_DIR/HealthKitPlugin.gdip" "$OUTPUT_DIR/HealthKitPlugin.gdip"
 log_success "=== Build complete! ==="
 log_info "Output at: $OUTPUT_DIR/"
 log_info ""
-log_info "To install, copy the contents of build/output/ into your Godot project's ios/plugins/ folder:"
-log_info "  cp -r $OUTPUT_DIR/* <your-godot-project>/ios/plugins/"
+log_info "To install, copy the contents of build/output/ into your Godot project's addons/healthkit_plugin/ folder:"
+log_info "  cp -r $OUTPUT_DIR/* <your-godot-project>/addons/healthkit_plugin/"
 
 # Optionally copy to demo project
-DEMO_PLUGINS="$PROJECT_ROOT/platforms/godot_editor/ios/plugins"
+DEMO_PLUGINS="$PROJECT_ROOT/platforms/godot_editor/addons/healthkit_plugin"
 if [ -d "$PROJECT_ROOT/platforms/godot_editor" ]; then
     log_info "Copying to demo project..."
     rm -rf "$DEMO_PLUGINS/HealthKitPlugin" "$DEMO_PLUGINS/HealthKitPlugin.gdip"
