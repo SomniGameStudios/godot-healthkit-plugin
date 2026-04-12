@@ -69,23 +69,25 @@ jobs:
 
       - name: Package release zip
         run: |
+          # Create directory structure
           mkdir -p package/addons/healthkit_plugin/demo
+          mkdir -p package/ios/plugins
           
-          # 1. Copy plugin files (API classes)
+          # 1. Copy plugin files (API classes) to addons
           cp platforms/godot_editor/addons/healthkit_plugin/*.gd package/addons/healthkit_plugin/
           cp platforms/godot_editor/addons/healthkit_plugin/*.cfg package/addons/healthkit_plugin/
           
-          # 2. Copy compiled native binaries
-          cp -r platforms/ios/build/output/HealthKitPlugin package/addons/healthkit_plugin/
-          cp platforms/ios/build/output/HealthKitPlugin.gdip package/addons/healthkit_plugin/
+          # 2. Copy compiled native binaries to ios/plugins
+          cp -r platforms/ios/build/output/HealthKitPlugin package/ios/plugins/
+          cp platforms/ios/build/output/HealthKitPlugin.gdip package/ios/plugins/
           
           # 3. Copy demo files
           cp -r platforms/godot_editor/addons/healthkit_plugin/demo/* package/addons/healthkit_plugin/demo/
           cp platforms/godot_editor/icon.svg package/addons/healthkit_plugin/demo/
           
-          # Zip the package
+          # Zip the package including both addons and ios folders
           cd package
-          zip -r "${{ github.workspace }}/HealthKitPlugin-${{ inputs.version }}-godot${{ inputs.godot_version }}.zip" addons
+          zip -r "${{ github.workspace }}/HealthKitPlugin-${{ inputs.version }}-godot${{ inputs.godot_version }}.zip" addons ios
 
       - name: Create GitHub Release
         env:
