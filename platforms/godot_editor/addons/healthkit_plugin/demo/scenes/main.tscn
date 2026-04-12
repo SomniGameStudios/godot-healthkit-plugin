@@ -1,7 +1,7 @@
-[gd_scene load_steps=7 format=3 uid="uid://cii7r0tlrlqoo"]
+[gd_scene format=3 uid="uid://cii7r0tlrlqoo"]
 
-[ext_resource type="Script" uid="uid://dc5kywrohbr0v" path="res://main.gd" id="1_main"]
-[ext_resource type="Script" uid="uid://dbg2y32gc1ybd" path="res://scenes/safe_area_container.gd" id="2_safe_area"]
+[ext_resource type="Script" uid="uid://dc5kywrohbr0v" path="res://addons/healthkit_plugin/demo/scripts/main.gd" id="1_main"]
+[ext_resource type="Script" uid="uid://dbg2y32gc1ybd" path="res://addons/healthkit_plugin/demo/scripts/safe_area_container.gd" id="2_safe_area"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_card"]
 content_margin_left = 20.0

@@ -26,9 +26,11 @@ A Godot 4 iOS plugin that provides native HealthKit step counting and App Tracki
              HealthKitPlugin.debug.xcframework/
              HealthKitPlugin.release.xcframework/
          demo/
-           main.tscn
-           ...
-   ```
+           scenes/
+             main.tscn
+           scripts/
+             main.gd
+             ...   ```
 3. In Godot, go to **Project > Project Settings > Plugins** and enable the **HealthKit Plugin**
 4. In Godot, go to **Project > Export > iOS** and enable the **HealthKitPlugin** plugin
 5. The plugin auto-injects required permissions (HealthKit, Tracking) into your export

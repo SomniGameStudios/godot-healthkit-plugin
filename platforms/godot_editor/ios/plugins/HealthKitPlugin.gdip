@@ -1,0 +1,21 @@
+[config]
+name="HealthKitPlugin"
+binary="HealthKitPlugin/bin/HealthKitPlugin.xcframework"
+
+initialization="init_healthkit_plugin"
+deinitialization="deinit_healthkit_plugin"
+
+[dependencies]
+linked=[]
+embedded=[]
+system=["HealthKit.framework", "CoreMotion.framework"]
+
+capabilities=["healthkit"]
+
+files=[]
+linker_flags=[]
+
+[plist]
+NSHealthShareUsageDescription:string_input="This app needs access to your step count data."
+NSHealthUpdateUsageDescription:string_input="This app needs access to update your health data."
+NSMotionUsageDescription:string_input="This app needs access to motion data to track your steps in real time."
