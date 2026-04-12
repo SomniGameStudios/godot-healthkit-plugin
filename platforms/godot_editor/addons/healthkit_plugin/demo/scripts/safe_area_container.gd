@@ -20,23 +20,26 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-# plugin.gd
-@tool
-extends EditorPlugin
+class_name SafeAreaContainer extends MarginContainer
 
-var export_plugin: EditorExportPlugin
+func _ready() -> void:
+	apply_safe_area()
+	get_tree().get_root().size_changed.connect(apply_safe_area)
 
-func _enter_tree() -> void:
-	# Load the export plugin script safely
-	var ExportScript = load("res://addons/healthkit_plugin/export_plugin.gd")
-	if ExportScript:
-		export_plugin = ExportScript.new()
-		add_export_plugin(export_plugin)
-		print("HealthKit: Export plugin registered.")
+func apply_safe_area() -> void:
+	var top_margin = 0
+
+	if OS.has_feature("mobile"):
+		var safe_area = DisplayServer.get_display_safe_area()
+		var window_position = DisplayServer.window_get_position()
+		var relative_position = Vector2i(
+			safe_area.position.x - window_position.x,
+			safe_area.position.y - window_position.y
+		)
+
+		top_margin = max(0, relative_position.y)
 	else:
-		printerr("HealthKit: Could not load export script.")
+		var inset_top = 40
+		top_margin = inset_top
 
-func _exit_tree() -> void:
-	if export_plugin:
-		remove_export_plugin(export_plugin)
-		export_plugin = null
+	add_theme_constant_override("margin_top", top_margin)
