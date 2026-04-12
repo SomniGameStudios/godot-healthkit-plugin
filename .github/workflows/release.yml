@@ -19,6 +19,7 @@ jobs:
     runs-on: macos-latest
     permissions:
       contents: write
+      actions: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -33,6 +34,38 @@ jobs:
 
       - name: Build plugin
         run: ./platforms/ios/scripts/build.sh ${{ inputs.godot_version }}
+
+      - name: Setup Node.js (For Docs Versioning)
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: './docs/package-lock.json'
+
+      - name: Create Docs Version & Push
+        run: |
+          cd docs
+          npm ci
+          # Run versioning. We use || true to avoid crashing if the version already exists.
+          # If it exists, Docusaurus handles updates by you making changes directly to the versioned_docs folder!
+          npm run docusaurus docs:version ${{ inputs.version }} || true
+          
+          # Setup git config for the bot
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Add the newly created version files
+          git add .
+          
+          # Commit and push if there are changes
+          if ! git diff-index --quiet HEAD; then
+            git commit -m "docs: release version ${{ inputs.version }}"
+            git push
+            
+            # The push above is done with the default GITHUB_TOKEN, which won't trigger docs.yml automatically.
+            # So, we manually trigger the docs.yml workflow so your Github Pages updates with the new version!
+            gh workflow run docs.yml --ref main
+          fi
 
       - name: Package release zip
         run: |
