@@ -1,0 +1,13 @@
+{
+  "tutorialSidebar": [
+    {
+      "type": "category",
+      "label": "Documentation",
+      "items": [
+        "intro",
+        "api",
+        "building"
+      ]
+    }
+  ]
+}
