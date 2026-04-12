@@ -26,6 +26,8 @@ public:
     int get_permission_status();
     bool is_health_data_available();
     void open_settings();
+
+    void refresh_health_store();
     
     void start_step_observer();
     void stop_step_observer();
@@ -49,6 +51,7 @@ private:
     void* health_store = nullptr;
     void* observer_query = nullptr;
     void* pedometer = nullptr;
+    void* pedometer_start_time = nullptr;
     std::mutex data_mutex;
 };
 

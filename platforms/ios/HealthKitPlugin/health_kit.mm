@@ -18,6 +18,7 @@ void HealthKit::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_permission_status"), &HealthKit::get_permission_status);
     ClassDB::bind_method(D_METHOD("is_health_data_available"), &HealthKit::is_health_data_available);
     ClassDB::bind_method(D_METHOD("open_settings"), &HealthKit::open_settings);
+    ClassDB::bind_method(D_METHOD("refresh_health_store"), &HealthKit::refresh_health_store);
     ClassDB::bind_method(D_METHOD("start_step_observer"), &HealthKit::start_step_observer);
     ClassDB::bind_method(D_METHOD("stop_step_observer"), &HealthKit::stop_step_observer);
 
@@ -265,6 +266,16 @@ void HealthKit::open_settings() {
     }
 }
 
+void HealthKit::refresh_health_store() {
+    NSLog(@"Refreshing HKHealthStore to force sensor sync");
+    if (health_store) {
+        CFBridgingRelease(health_store);
+        health_store = nullptr;
+    }
+    HKHealthStore* store = [[HKHealthStore alloc] init];
+    health_store = (void*)CFBridgingRetain(store);
+}
+
 void HealthKit::start_step_observer() {
     if (!health_store) return;
     if (observer_query) return; // Already running
@@ -350,6 +361,15 @@ int HealthKit::get_pedometer_permission_status() {
 void HealthKit::start_pedometer_observer() {
     if (!pedometer) return;
     CMPedometer* ped = (__bridge CMPedometer*)pedometer;
+
+    // Stop any previous updates (Apple: calling start twice = undefined behavior)
+    [ped stopPedometerUpdates];
+
+    // Reset live counter so a stale read between restart and first callback returns 0
+    {
+        std::lock_guard<std::mutex> lock(data_mutex);
+        live_pedometer_steps = 0;
+    }
     
     NSDate *now = [NSDate date];
     // We start counting from right now
@@ -394,6 +414,10 @@ HealthKit::~HealthKit() {
         [ped stopPedometerUpdates];
         CFBridgingRelease(pedometer);
         pedometer = nullptr;
+    }
+    if (pedometer_start_time) {
+        CFBridgingRelease(pedometer_start_time);
+        pedometer_start_time = nullptr;
     }
     if (health_store) {
         CFBridgingRelease(health_store);
