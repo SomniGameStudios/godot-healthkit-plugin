@@ -34,3 +34,7 @@ The `platforms/godot_editor/` directory contains a minimal Godot project that de
 ## License
 
 MIT License. See [LICENSE](LICENSE) for details.
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=SomniGameStudios/godot-healthkit-plugin&type=Date)](https://star-history.com/#SomniGameStudios/godot-healthkit-plugin&Date)
