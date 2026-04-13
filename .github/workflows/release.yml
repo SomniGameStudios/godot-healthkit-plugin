@@ -1,13 +1,9 @@
 name: Release
-run-name: Release ${{ inputs.version }}
+run-name: Release ${{ steps.get_version.outputs.version }}
 
 on:
   workflow_dispatch:
     inputs:
-      version:
-        description: 'Release version (e.g. 1.0.0)'
-        required: true
-        type: string
       godot_version:
         description: 'Godot version (e.g. 4.6.1)'
         required: false
@@ -23,6 +19,22 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Extract version from plugin.cfg
+        id: get_version
+        run: |
+          VERSION=$(grep "version=" platforms/godot_editor/addons/healthkit_plugin/plugin.cfg | sed 's/version="//;s/"//')
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Check if version already exists
+        run: |
+          if git rev-parse "v${{ steps.get_version.outputs.version }}" >/dev/null 2>&1; then
+            echo "Error: Version v${{ steps.get_version.outputs.version }} already exists in git tags."
+            exit 1
+          fi
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -48,7 +60,7 @@ jobs:
 #          npm ci
 #          # Run versioning. We use || true to avoid crashing if the version already exists.
 #          # If it exists, Docusaurus handles updates by you making changes directly to the versioned_docs folder!
-#          npm run docusaurus docs:version ${{ inputs.version }} || true
+#          npm run docusaurus docs:version ${{ steps.get_version.outputs.version }} || true
 #          
 #          # Setup git config for the bot
 #          git config --global user.name "github-actions[bot]"
@@ -59,7 +71,7 @@ jobs:
 #          
 #          # Commit and push if there are changes
 #          if ! git diff-index --quiet HEAD; then
-#            git commit -m "docs: release version ${{ inputs.version }}"
+#            git commit -m "docs: release version ${{ steps.get_version.outputs.version }}"
 #            git push
 #            
 #            # The push above is done with the default GITHUB_TOKEN, which won't trigger docs.yml automatically.
@@ -87,13 +99,13 @@ jobs:
           
           # Zip the package including both addons and ios folders
           cd package
-          zip -r "${{ github.workspace }}/HealthKitPlugin-${{ inputs.version }}-godot${{ inputs.godot_version }}.zip" addons ios
+          zip -r "${{ github.workspace }}/HealthKitPlugin-${{ steps.get_version.outputs.version }}-godot${{ inputs.godot_version }}.zip" addons ios
 
       - name: Create GitHub Release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create "v${{ inputs.version }}" \
-            --title "HealthKitPlugin v${{ inputs.version }} (Godot ${{ inputs.godot_version }})" \
+          gh release create "v${{ steps.get_version.outputs.version }}" \
+            --title "HealthKitPlugin v${{ steps.get_version.outputs.version }} (Godot ${{ inputs.godot_version }})" \
             --generate-notes \
-            "HealthKitPlugin-${{ inputs.version }}-godot${{ inputs.godot_version }}.zip"
+            "HealthKitPlugin-${{ steps.get_version.outputs.version }}-godot${{ inputs.godot_version }}.zip"

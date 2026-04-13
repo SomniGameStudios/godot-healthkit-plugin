@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-class_name SafeAreaContainer extends MarginContainer
+class_name HK_SafeAreaContainer extends MarginContainer
 
 func _ready() -> void:
 	apply_safe_area()
