@@ -4,54 +4,36 @@ sidebar_position: 2
 
 # GDScript API
 
-The plugin registers a singleton accessible via `Engine.get_singleton("GodotHealthKit")`. It is recommended to check for its existence before trying to use its methods.
+The plugin provides a GDScript wrapper named `HealthKit`, which is automatically registered as an Autoload singleton when the plugin is enabled. It is the recommended way to interact with the plugin as it handles platform checks and provides mock data for non-iOS platforms.
 
-Alternatively, if you use the provided plugin's GDScript wrapper, it handles the singleton check and provides a more idiomatic GDScript interface with mock data for non-iOS platforms.
+### Singleton: HealthKit (GDScript Wrapper)
 
-### Singleton: GodotHealthKit
+This is the recommended interface. It wraps the native `GodotHealthKit` singleton.
+
+```gdscript
+func _ready() -> void:
+    # Signals
+    HealthKit.permission_result.connect(_on_permission_result)
+    HealthKit.steps_updated.connect(_on_steps_updated)
+    HealthKit.today_steps_ready.connect(_on_today_steps_ready)
+
+    # Request permission
+    HealthKit.request_permission()
+
+    # Query today's steps
+    HealthKit.run_today_steps_query()
+    var steps: int = await HealthKit.today_steps_ready
+    print("Today's steps: ", steps)
+```
+
+### Native Singleton: GodotHealthKit
+
+If you prefer to use the native C++ singleton directly:
 
 ```gdscript
 if Engine.has_singleton("GodotHealthKit"):
     var hk = Engine.get_singleton("GodotHealthKit")
-
-    # Connect to signals
-    hk.connect("permission_result", _on_permission_result)
-    hk.connect("steps_updated", _on_steps_updated)
-    hk.connect("today_steps_ready", _on_today_steps_ready)
-    hk.connect("total_steps_ready", _on_total_steps_ready)
-    hk.connect("period_steps_ready", _on_period_steps_ready)
-    hk.connect("pedometer_steps_updated", _on_pedometer_steps_updated)
-    hk.connect("pedometer_error", _on_pedometer_error)
-
-    # HealthKit Methods
-    if hk.is_health_data_available():
-        hk.request_permission()
-        var status: int = hk.get_permission_status()
-        
-        # Async queries (listen for *_ready signals)
-        hk.run_today_steps_query()
-        hk.run_total_steps_query()
-        hk.run_period_steps_query(7)  # last 7 days
-
-        # Cached results (updated after queries or via observer)
-        var today: int = hk.get_today_steps()
-        var total: int = hk.get_total_steps()
-        var period: Dictionary = hk.get_period_steps_dict()
-
-        # Real-time observer (triggers steps_updated signal)
-        hk.start_step_observer()
-        # hk.stop_step_observer()
-
-    # Pedometer Methods (CoreMotion)
-    if hk.is_pedometer_available():
-        var p_status: int = hk.get_pedometer_permission_status()
-        hk.start_pedometer_observer()
-        var live_steps: int = hk.get_live_pedometer_steps()
-        # hk.stop_pedometer_observer()
-
-    # Utilities
-    hk.open_settings()
-    hk.refresh_health_store()
+    # ... use native methods directly
 ```
 
 ### Signals

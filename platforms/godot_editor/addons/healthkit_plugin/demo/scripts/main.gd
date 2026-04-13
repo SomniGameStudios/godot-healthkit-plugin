@@ -22,9 +22,10 @@
 
 extends Control
 
-@onready var result_label: Label = $SafeAreaContainer/ScrollContainer/VBoxContainer/ResultLabel
+@onready var result_label: Label = $HK_SafeAreaContainer/ScrollContainer/VBoxContainer/ResultLabel
 
 func _ready() -> void:
+	# Accessing the global HealthKit singleton directly
 	HealthKit.permission_result.connect(_on_permission_result)
 	HealthKit.steps_updated.connect(_on_steps_updated)
 	HealthKit.pedometer_steps_updated.connect(_on_pedometer_steps_updated)
@@ -61,13 +62,13 @@ func _on_hk_request_permission() -> void:
 	result_label.text = "Requesting HealthKit permission..."
 
 func _on_hk_check_status() -> void:
-	var available := HealthKit.is_health_data_available()
-	var hk_status := HealthKit.get_permission_status()
+	var available: bool = HealthKit.is_health_data_available()
+	var hk_status: int = HealthKit.get_permission_status()
 	result_label.add_theme_color_override("font_color", Color.BLACK)
 
-	var status_str := HealthKit.get_permission_status_string(hk_status)
+	var status_str: String = HealthKit.get_permission_status_string(hk_status)
 
-	if hk_status == HealthKit.AuthorizationStatus.NOT_DETERMINED:
+	if hk_status == HealthKitPlugin.AuthorizationStatus.NOT_DETERMINED:
 		result_label.text = "HK Available: %s\nHK Status: %s\nTap 'Request Permission' first" % [str(available).to_upper(), status_str]
 		return
 
@@ -95,10 +96,10 @@ func _on_hk_total_steps() -> void:
 func _on_hk_period_steps() -> void:
 	HealthKit.run_period_steps_query(7)
 	var data: Dictionary = await HealthKit.period_steps_ready
-	var text := "Steps (last 7 days):\n"
-	var keys := data.keys()
+	var text: String = "Steps (last 7 days):\n"
+	var keys: Array = data.keys()
 	keys.sort()
-	for date in keys:
+	for date: String in keys:
 		text += "%s: %d\n" % [date, data[date]]
 	result_label.text = text
 
@@ -117,30 +118,30 @@ func _on_hk_open_settings() -> void:
 # --- CoreMotion Pedometer actions ---
 
 func _on_cm_check_status() -> void:
-	var motion_status := HealthKit.get_pedometer_permission_status()
-	var pedometer_hw := HealthKit.is_pedometer_available()
+	var motion_status: int = HealthKit.get_pedometer_permission_status()
+	var pedometer_hw: bool = HealthKit.is_pedometer_available()
 	result_label.add_theme_color_override("font_color", Color.BLACK)
 
-	var status_str := "Unknown"
+	var status_str: String = "Unknown"
 	match motion_status:
-		HealthKit.MotionAuthorizationStatus.NOT_DETERMINED:
+		HealthKitPlugin.MotionAuthorizationStatus.NOT_DETERMINED:
 			status_str = "Not Determined (will prompt on start)"
-		HealthKit.MotionAuthorizationStatus.RESTRICTED:
+		HealthKitPlugin.MotionAuthorizationStatus.RESTRICTED:
 			status_str = "Restricted (device policy)"
-		HealthKit.MotionAuthorizationStatus.DENIED:
+		HealthKitPlugin.MotionAuthorizationStatus.DENIED:
 			status_str = "Denied (enable in Settings > Privacy > Motion & Fitness)"
-		HealthKit.MotionAuthorizationStatus.AUTHORIZED:
+		HealthKitPlugin.MotionAuthorizationStatus.AUTHORIZED:
 			status_str = "Authorized"
 
 	result_label.text = "CM Permission: %s\nPedometer HW: %s" % [status_str, str(pedometer_hw).to_upper()]
 
 func _on_cm_start_pedometer() -> void:
-	var motion_status := HealthKit.get_pedometer_permission_status()
-	if motion_status == HealthKit.MotionAuthorizationStatus.DENIED:
+	var motion_status: int = HealthKit.get_pedometer_permission_status()
+	if motion_status == HealthKitPlugin.MotionAuthorizationStatus.DENIED:
 		result_label.add_theme_color_override("font_color", Color.RED)
 		result_label.text = "Motion denied.\nSettings > Privacy > Motion & Fitness"
 		return
-	if motion_status == HealthKit.MotionAuthorizationStatus.RESTRICTED:
+	if motion_status == HealthKitPlugin.MotionAuthorizationStatus.RESTRICTED:
 		result_label.add_theme_color_override("font_color", Color.RED)
 		result_label.text = "Motion restricted by device policy."
 		return
