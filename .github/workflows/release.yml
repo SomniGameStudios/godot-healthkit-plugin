@@ -1,5 +1,4 @@
 name: Release
-run-name: Release ${{ steps.get_version.outputs.version }}
 
 on:
   workflow_dispatch:
