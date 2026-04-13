@@ -11,10 +11,10 @@ const config: Config = {
     v4: true,
   },
 
-  url: 'https://github.com',
-  baseUrl: '/',
+  url: 'https://SomniGameStudios.github.io',
+  baseUrl: '/godot-healthkit-plugin/',
 
-  organizationName: 'godot-plugins', 
+  organizationName: 'SomniGameStudios', 
   projectName: 'godot-healthkit-plugin', 
 
   onBrokenLinks: 'throw',
@@ -63,7 +63,7 @@ const config: Config = {
           position: 'right',
         },
         {
-          href: 'https://github.com/godot-healthkit-plugin',
+          href: 'https://github.com/SomniGameStudios/godot-healthkit-plugin',
           label: 'GitHub',
           position: 'right',
         },
