@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-extends Node
+class_name HealthKitPlugin extends Node
 ## HealthKit autoload — wraps the GodotHealthKit singleton.
 ## On non-iOS platforms, returns mock data for editor testing.
 
@@ -32,8 +32,8 @@ signal today_steps_ready(steps: int)
 signal total_steps_ready(steps: int)
 signal period_steps_ready(steps_dict: Dictionary)
 
-var _healthkit_plugin = null
-var _is_ios: bool = false
+var _healthkit_plugin: Object = null
+var _is_ios := false
 
 enum AuthorizationStatus {
 	NOT_DETERMINED = 0,
@@ -66,13 +66,13 @@ func _ready() -> void:
 	if _is_ios:
 		if Engine.has_singleton("GodotHealthKit"):
 			_healthkit_plugin = Engine.get_singleton("GodotHealthKit")
-			_healthkit_plugin.connect("permission_result", Callable(self, "_on_permission_result"))
-			_healthkit_plugin.connect("steps_updated", Callable(self, "_on_steps_updated"))
-			_healthkit_plugin.connect("pedometer_steps_updated", Callable(self, "_on_pedometer_steps_updated"))
-			_healthkit_plugin.connect("pedometer_error", Callable(self, "_on_pedometer_error"))
-			_healthkit_plugin.connect("today_steps_ready", Callable(self, "_on_today_steps_ready"))
-			_healthkit_plugin.connect("total_steps_ready", Callable(self, "_on_total_steps_ready"))
-			_healthkit_plugin.connect("period_steps_ready", Callable(self, "_on_period_steps_ready"))
+			_healthkit_plugin.connect("permission_result", _on_permission_result)
+			_healthkit_plugin.connect("steps_updated", _on_steps_updated)
+			_healthkit_plugin.connect("pedometer_steps_updated", _on_pedometer_steps_updated)
+			_healthkit_plugin.connect("pedometer_error", _on_pedometer_error)
+			_healthkit_plugin.connect("today_steps_ready", _on_today_steps_ready)
+			_healthkit_plugin.connect("total_steps_ready", _on_total_steps_ready)
+			_healthkit_plugin.connect("period_steps_ready", _on_period_steps_ready)
 			print("HealthKit: iOS plugin initialized")
 		else:
 			printerr("HealthKit: GodotHealthKit singleton not found")
@@ -106,7 +106,7 @@ func request_permission() -> void:
 	if _healthkit_plugin:
 		_healthkit_plugin.request_permission()
 	else:
-		call_deferred("emit_signal", "permission_result", true)
+		permission_result.emit.call_deferred(true)
 
 func get_permission_status() -> int:
 	if _healthkit_plugin:
@@ -153,7 +153,7 @@ func run_today_steps_query() -> void:
 	if _healthkit_plugin:
 		_healthkit_plugin.run_today_steps_query()
 	else:
-		call_deferred("emit_signal", "today_steps_ready", 1234)
+		today_steps_ready.emit.call_deferred(1234)
 
 func open_settings() -> void:
 	if _healthkit_plugin:
@@ -164,40 +164,39 @@ func open_settings() -> void:
 func get_today_steps() -> int:
 	if _healthkit_plugin:
 		return _healthkit_plugin.get_today_steps()
-	return 1234  # Mock data
+	return 1234
 
 func run_total_steps_query() -> void:
 	if _healthkit_plugin:
 		_healthkit_plugin.run_total_steps_query()
 	else:
-		call_deferred("emit_signal", "total_steps_ready", 56789)
+		total_steps_ready.emit.call_deferred(56789)
 
 func get_total_steps() -> int:
 	if _healthkit_plugin:
 		return _healthkit_plugin.get_total_steps()
-	return 56789  # Mock data
+	return 56789
 
 func run_period_steps_query(days: int) -> void:
 	if _healthkit_plugin:
 		_healthkit_plugin.run_period_steps_query(days)
 	else:
-		var mock := {}
-		var today := Time.get_date_dict_from_system()
+		var mock: Dictionary = {}
+		var today: Dictionary = Time.get_date_dict_from_system()
 		for i in range(days):
-			var date := Time.get_date_string_from_unix_time(
+			var date: String = Time.get_date_string_from_unix_time(
 				Time.get_unix_time_from_datetime_dict(today) - i * 86400
 			)
 			mock[date] = randi_range(2000, 12000)
-		call_deferred("emit_signal", "period_steps_ready", mock)
+		period_steps_ready.emit.call_deferred(mock)
 
 func get_period_steps_dict() -> Dictionary:
 	if _healthkit_plugin:
 		return _healthkit_plugin.get_period_steps_dict()
-	# Mock data
-	var mock := {}
-	var today := Time.get_date_dict_from_system()
+	var mock: Dictionary = {}
+	var today: Dictionary = Time.get_date_dict_from_system()
 	for i in range(7):
-		var date := Time.get_date_string_from_unix_time(
+		var date: String = Time.get_date_string_from_unix_time(
 			Time.get_unix_time_from_datetime_dict(today) - i * 86400
 		)
 		mock[date] = randi_range(2000, 12000)

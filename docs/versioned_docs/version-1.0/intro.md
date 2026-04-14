@@ -22,9 +22,11 @@ A Godot 4 iOS plugin that provides native HealthKit step counting and motion tra
        healthkit_plugin/
          plugin.cfg
          plugin.gd
-         export_plugin.gd
-         health_kit.gd
          HealthKitPlugin.gdip
+         api/
+           health_kit.gd
+         export/
+           export_plugin.gd
          HealthKitPlugin/
            bin/
              HealthKitPlugin.debug.xcframework/

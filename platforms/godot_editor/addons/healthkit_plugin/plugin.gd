@@ -24,11 +24,17 @@
 @tool
 extends EditorPlugin
 
+const SINGLETON_NAME := "HealthKit"
+const SINGLETON_PATH := "res://addons/healthkit_plugin/api/health_kit.gd"
+
 var export_plugin: EditorExportPlugin
 
 func _enter_tree() -> void:
+	# Add autoload singleton
+	add_autoload_singleton(SINGLETON_NAME, SINGLETON_PATH)
+
 	# Load the export plugin script safely
-	var ExportScript = load("res://addons/healthkit_plugin/export_plugin.gd")
+	var ExportScript = load("res://addons/healthkit_plugin/export/export_plugin.gd")
 	if ExportScript:
 		export_plugin = ExportScript.new()
 		add_export_plugin(export_plugin)
@@ -37,6 +43,9 @@ func _enter_tree() -> void:
 		printerr("HealthKit: Could not load export script.")
 
 func _exit_tree() -> void:
+	# Remove autoload singleton
+	remove_autoload_singleton(SINGLETON_NAME)
+
 	if export_plugin:
 		remove_export_plugin(export_plugin)
 		export_plugin = null
