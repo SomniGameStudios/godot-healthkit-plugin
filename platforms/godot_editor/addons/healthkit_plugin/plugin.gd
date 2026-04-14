@@ -25,7 +25,7 @@
 extends EditorPlugin
 
 const SINGLETON_NAME := "HealthKit"
-const SINGLETON_PATH := "res://addons/healthkit_plugin/health_kit.gd"
+const SINGLETON_PATH := "res://addons/healthkit_plugin/api/health_kit.gd"
 
 var export_plugin: EditorExportPlugin
 
@@ -34,7 +34,7 @@ func _enter_tree() -> void:
 	add_autoload_singleton(SINGLETON_NAME, SINGLETON_PATH)
 
 	# Load the export plugin script safely
-	var ExportScript = load("res://addons/healthkit_plugin/export_plugin.gd")
+	var ExportScript = load("res://addons/healthkit_plugin/export/export_plugin.gd")
 	if ExportScript:
 		export_plugin = ExportScript.new()
 		add_export_plugin(export_plugin)

@@ -17,7 +17,7 @@ config/icon="res://icon.svg"
 
 [autoload]
 
-HealthKit="*uid://pm1dsblowjjd"
+HealthKit="*uid://bnh1bvvyrib1a"
 
 [display]
 

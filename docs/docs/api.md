@@ -6,9 +6,9 @@ sidebar_position: 2
 
 The plugin provides a GDScript wrapper named `HealthKit`, which is automatically registered as an Autoload singleton when the plugin is enabled. It is the recommended way to interact with the plugin as it handles platform checks and provides mock data for non-iOS platforms.
 
-### Singleton: HealthKit (GDScript Wrapper)
+### Singleton: HealthKit
 
-This is the recommended interface. It wraps the native `GodotHealthKit` singleton.
+This is the interface for interacting with the plugin. It wraps the native `GodotHealthKit` singleton under the hood.
 
 ```gdscript
 func _ready() -> void:
@@ -26,16 +26,6 @@ func _ready() -> void:
     print("Today's steps: ", steps)
 ```
 
-### Native Singleton: GodotHealthKit
-
-If you prefer to use the native C++ singleton directly:
-
-```gdscript
-if Engine.has_singleton("GodotHealthKit"):
-    var hk = Engine.get_singleton("GodotHealthKit")
-    # ... use native methods directly
-```
-
 ### Signals
 
 | Signal | Description |
@@ -47,6 +37,29 @@ if Engine.has_singleton("GodotHealthKit"):
 | `period_steps_ready(steps_dict: Dictionary)` | Emitted when `run_period_steps_query()` completes. |
 | `pedometer_steps_updated(steps: int)` | Emitted when the real-time pedometer detects new steps since it was started. |
 | `pedometer_error(reason: String)` | Emitted if the pedometer encounters an error. |
+
+### Methods
+
+| Method | Returns | Description |
+| :--- | :--- | :--- |
+| `request_permission()` | `void` | Requests permission to read HealthKit data. |
+| `get_permission_status()` | `int` | Returns the `AuthorizationStatus`. |
+| `get_permission_status_string(status: int)` | `String` | Returns a human-readable string for the given `AuthorizationStatus`. |
+| `is_health_data_available()` | `bool` | Checks if HealthKit is available on the device. |
+| `start_step_observer()` | `void` | Starts background observation for step count changes. |
+| `stop_step_observer()` | `void` | Stops background step observation. |
+| `is_pedometer_available()` | `bool` | Checks if the device supports CMPedometer. |
+| `get_pedometer_permission_status()` | `int` | Returns the `MotionAuthorizationStatus`. |
+| `start_pedometer_observer()` | `void` | Starts real-time pedometer tracking. |
+| `stop_pedometer_observer()` | `void` | Stops real-time pedometer tracking. |
+| `get_live_pedometer_steps()` | `int` | Returns the number of steps tracked since the pedometer was started. |
+| `run_today_steps_query()` | `void` | Requests the total step count for today. Emits `today_steps_ready` when done. |
+| `get_today_steps()` | `int` | Returns the cached step count for today (after query finishes). |
+| `run_total_steps_query()` | `void` | Requests the all-time total step count. Emits `total_steps_ready` when done. |
+| `get_total_steps()` | `int` | Returns the cached all-time step count (after query finishes). |
+| `run_period_steps_query(days: int)` | `void` | Requests daily step counts for the past `days`. Emits `period_steps_ready`. |
+| `get_period_steps_dict()` | `Dictionary` | Returns the cached dictionary of period steps (e.g., `{"2026-04-13": 5000}`). |
+| `open_settings()` | `void` | Opens the app settings (useful if permissions were denied). |
 
 ### Enums
 
