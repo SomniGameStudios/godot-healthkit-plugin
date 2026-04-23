@@ -6,9 +6,9 @@ on:
   workflow_dispatch:
     inputs:
       godot_version:
-        description: 'Godot version (e.g. 4.6.1)'
+        description: 'Godot version (e.g. 4.6.2)'
         required: false
-        default: '4.6.1'
+        default: '4.6.2'
 
 jobs:
   build:
@@ -26,7 +26,7 @@ jobs:
         run: pip install scons
 
       - name: Build plugin
-        run: ./platforms/ios/scripts/build.sh ${{ github.event.inputs.godot_version || '4.6.1' }}
+        run: ./platforms/ios/scripts/build.sh ${{ github.event.inputs.godot_version || '4.6.2' }}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4

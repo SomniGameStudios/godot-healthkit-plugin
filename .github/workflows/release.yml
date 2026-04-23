@@ -4,9 +4,9 @@ on:
   workflow_dispatch:
     inputs:
       godot_version:
-        description: 'Godot version (e.g. 4.6.1)'
+        description: 'Godot version (e.g. 4.6.2)'
         required: false
-        default: '4.6.1'
+        default: '4.6.2'
         type: string
 
 jobs:

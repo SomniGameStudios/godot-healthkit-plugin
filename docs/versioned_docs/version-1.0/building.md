@@ -10,8 +10,8 @@ Requires macOS with Xcode and Python (for scons).
 # Install scons
 pip install scons
 
-# Build for Godot 4.6.1
-./platforms/ios/scripts/build.sh 4.6.1
+# Build for Godot 4.6.2
+./platforms/ios/scripts/build.sh 4.6.2
 ```
 
 This will:

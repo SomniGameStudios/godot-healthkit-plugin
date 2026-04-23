@@ -2,7 +2,7 @@
 # scripts/build.sh — Main build script for HealthKitPlugin
 #
 # Usage: ./platforms/ios/scripts/build.sh <godot_version>
-# Example: ./platforms/ios/scripts/build.sh 4.6.1
+# Example: ./platforms/ios/scripts/build.sh 4.6.2
 #
 # Produces:
 #   build/output/HealthKitPlugin.gdip
@@ -21,7 +21,7 @@ OUTPUT_DIR="$BUILD_DIR/output"
 
 if [ $# -eq 0 ]; then
     log_error "Usage: $0 <godot_version>"
-    log_error "Example: $0 4.6.1"
+    log_error "Example: $0 4.6.2"
     exit 1
 fi
 

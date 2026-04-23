@@ -5,7 +5,7 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source "$SCRIPT_DIR/common.sh"
 
 if [ $# -eq 0 ]; then
-    log_error "Usage: $0 <godot_version>  (e.g. 4.6.1)"
+    log_error "Usage: $0 <godot_version>  (e.g. 4.6.2)"
     exit 1
 fi
 
